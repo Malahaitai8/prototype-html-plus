@@ -37,3 +37,21 @@
 - Added `built-in-skills/design-system-reference.md` as a routing guide, not a full implementation step.
 - Confirmed that the Skill should choose references by scenario instead of loading all design-system guidance at once.
 - Confirmed that numbered pin annotation is the only V1 annotation model; long connector lines are out of scope.
+
+## 2026-06-26 - Step 2 Requirement Intake Decisions
+
+- Requirement intake is a PRD Lite workflow, not a decorative questionnaire.
+- The Skill must first fill known information from the user's request, then ask only for blocking gaps.
+- Default intake format is Markdown PRD Lite in chat; it must not assume a real interactive form.
+- Each important PRD item must be marked as `已确认`, `待确认`, or `Agent 假设`.
+- Ask at most 5 blocking questions per round.
+- Missing core information requires clarification before prototype generation: side/platform, prototype goal, user role, output mode, scope, core modules, and key data/fields/states.
+- "帮我推荐" is allowed, but recommendations must be marked as `Agent 假设` and confirmed before generation.
+- "跳过，直接生成初版" produces a PRD draft with assumptions first; it does not jump directly to HTML.
+- Before generating any prototype, the Agent must ask the user to confirm or revise the PRD Lite.
+- In a project workspace, the Agent may suggest saving a confirmed PRD Lite as `requirements.md`, but must ask before writing it.
+- Large requests must be split into a prototype queue: main path first, then expanded interactions, states, and visual polish.
+- After the user answers clarification questions, the Agent must re-output the complete updated PRD Lite and run a confirmation gate before saving files or generating HTML.
+- "按推荐继续" confirms assumptions only; it is not permission to generate HTML or write `requirements.md` unless the user explicitly says so.
+- The prototype step plan is binding: each generation should execute only the current step by default, then ask for user acceptance before continuing.
+- For every product type, design principles and risk boundaries must be confirmed before prototype generation; sensitive or emotion-heavy domains require extra care but are not the only cases.

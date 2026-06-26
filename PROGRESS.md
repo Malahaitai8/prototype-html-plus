@@ -127,3 +127,52 @@
 ### Git 提交
 - Commit: `docs: refine design reference routing`
 - 分支: `main`
+
+## 2026-06-26 15:51 - Step 2 Requirement Intake / PRD Lite
+
+### 本次完成
+- 新增 `built-in-skills/requirement-intake.md`，定义需求确认 / PRD Lite 工作流。
+- 更新 `SKILL.md`，要求模糊需求或信息不足的原型请求先进入 PRD Lite，不直接生成 HTML。
+- 更新 `DECISIONS.md`，记录 Step 2 的需求确认规则。
+- 新增 `test-prompts/02-requirement-intake-test.md`，覆盖模糊需求、完整 brief、帮我推荐、跳过初版和大范围拆分。
+- 根据真实调用测试反馈，补充 PRD 确认闸门、分步执行协议和设计原则确认区。
+- 将测试线程生成的 `requirements.md` 加入 `.gitignore`，避免误提交样例 PRD。
+
+### 当前效果
+- Skill 能把“表单化提问”落成 Markdown PRD Lite，而不是假设存在真实交互表单。
+- 用户已有信息会先被填入 PRD Lite，缺口标记为 `待确认`。
+- 推荐内容会标记为 `Agent 假设`。
+- 大需求会被拆成主路径初版、扩展交互、异常状态和视觉细化。
+- 用户回答追问后必须回显完整更新版 PRD Lite，再确认是否保存和是否进入 Step A。
+- 分步计划被定义为执行队列，默认每次只做当前步骤，做完后验收再进入下一步。
+- 所有产品类型都必须确认设计原则和风险边界；敏感或情绪化场景需要更仔细，但不是唯一需要确认的类型。
+
+### 测试方式
+- 检查 `requirement-intake.md` 是否包含默认流程、PRD Lite 模板、追问规则、推荐/跳过策略、分步规则和保存 `requirements.md` 的边界。
+- 检查是否包含 PRD 确认闸门、分步执行协议和设计原则确认区。
+- 检查 `SKILL.md` 是否将模糊需求路由到 `requirement-intake.md`。
+- 检查 `DECISIONS.md` 是否记录 Step 2 关键规则。
+- 检查 `02-requirement-intake-test.md` 是否可独立验证 Step 2。
+- 执行关键词覆盖检查和 `git diff --check`。
+
+### 测试结果
+- 已确认 Step 2 关键规则均覆盖：PRD Lite、`已确认` / `待确认` / `Agent 假设`、最多 5 个追问、帮我推荐、跳过初版、`requirements.md` 保存边界、原型分步计划、不直接生成 HTML。
+- `SKILL.md` 已将模糊需求和信息不足的原型请求路由到 `requirement-intake.md`。
+- `02-requirement-intake-test.md` 已覆盖 5 组测试输入。
+- `git diff --check` 通过；仅有 Windows 行尾转换提示，无空白错误。
+- 本步没有新增 HTML demo，符合“只实现需求确认规则”的范围。
+- 已同步到全局 Skill 目录并完成真实调用复测。
+- 复测结果：Skill 先输出 PRD Lite，用户回答后回显完整更新版 PRD，没有保存 `requirements.md`，没有生成 HTML，并询问是否确认 PRD、是否保存、是否进入 Step A。
+
+### 遇到的问题 / 瓶颈
+- 第一次真实调用时，Skill 在用户回答后直接保存了 `requirements.md`，没有先回显完整 PRD 并等待确认；已通过 PRD 确认闸门修复。
+
+### 暂未解决
+- 无。
+
+### 下一步目标
+- 进入 Step 3 前先确认线框稿模式的具体规则。
+
+### Git 提交
+- Commit: `docs: add requirement intake workflow`
+- 分支: `main`

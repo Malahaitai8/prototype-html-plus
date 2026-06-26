@@ -16,9 +16,15 @@ Use this Skill to create product prototype artifacts that combine:
 
 This Skill is under V1 construction. Follow the built-in skill files as they are added during V1. If a requested capability has not been implemented yet, explain that it belongs to a later V1 step and ask for the missing requirements instead of inventing rules.
 
+## Requirement Intake Rule
+
+When the user gives a vague idea or asks for a prototype without enough detail, do not immediately generate HTML. Use `built-in-skills/requirement-intake.md` to produce a PRD Lite draft, mark confirmed facts / pending questions / Agent assumptions, ask at most 5 blocking questions, then re-output the complete updated PRD Lite for confirmation. Do not save `requirements.md` or generate HTML until the user explicitly confirms that action.
+
+The PRD step plan is binding: execute only the current step by default, complete it, show preview/test/known issues, then wait for user acceptance before moving to the next step.
+
 ## V1 Capability Routing
 
-- For vague product ideas, use `built-in-skills/requirement-intake.md` once available.
+- For vague product ideas or under-specified prototype requests, use `built-in-skills/requirement-intake.md` before generating HTML.
 - For low-fidelity structure-first prototypes, use `built-in-skills/wireframe.md` once available.
 - For high-fidelity admin prototypes, use `built-in-skills/hi-fi.md` once available.
 - For region screenshot rebuilds, use `built-in-skills/region-rebuild.md` once available.

@@ -2,6 +2,7 @@
 *.local.md
 local-notes/
 scratch/
+requirements.md
 
 # Codex and agent runtime traces
 .codex/
@@ -25,4 +26,3 @@ node_modules/
 .DS_Store
 Thumbs.db
 .vscode/
-
