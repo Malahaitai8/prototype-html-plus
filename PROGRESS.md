@@ -40,3 +40,46 @@
 ### Git 提交
 - Commit: `chore: bootstrap prototype-html-plus`
 - 分支: `main`
+
+## 2026-06-26 15:01 - Step 1 Reference Skill Research
+
+### 本次完成
+- 调研并沉淀 `prototype-html-plus` V1 参考体系。
+- 新增 `docs/reference-skill-analysis.md`，覆盖社区 Skill / 仓库和官方设计系统。
+- 更新 `DECISIONS.md`，记录目录结构、编号圆点、线框分层、高保真基线、设计系统参考和不复制代码原则。
+- 新增 `skills/prototype-html-plus/test-prompts/01-reference-analysis-test.md`。
+- 确认 `PROGRESS.md` 文件本身是 UTF-8，之前乱码是 PowerShell 显示编码问题。
+
+### 当前效果
+- 后续 Step 2-7 有了可接续的参考依据和设计取舍。
+- 参考仓库只沉淀为概念、流程和文件映射，没有复制代码。
+- 测试 Prompt 可用于新线程单独验证 Step 1 文档质量。
+
+### 测试方式
+- 检查 `docs/reference-skill-analysis.md` 是否覆盖全部指定参考源。
+- 检查每个参考源是否包含“可借鉴点、不照搬/风险、落地策略”。
+- 检查 `DECISIONS.md` 是否记录 Step 1 关键取舍。
+- 检查 `01-reference-analysis-test.md` 是否可独立使用。
+- 执行 `git diff --check`、`git status --short`。
+
+### 测试结果
+- `docs/reference-skill-analysis.md` 已覆盖 10 个参考源：7 个社区 Skill / 仓库方向和 3 个官方设计系统。
+- 每个参考源均包含“可借鉴点、不照搬 / 风险、落地策略”。
+- `DECISIONS.md` 已记录 Step 1 关键取舍。
+- `01-reference-analysis-test.md` 已包含测试目标、测试输入、预期行为、预期产物、人工验收点和失败表现。
+- `git diff --check` 通过；仅有 Windows 行尾转换提示，无空白错误。
+
+### 遇到的问题 / 瓶颈
+- 通过 Git 克隆 `vagerent/prototype-html` 时，GitHub HTTPS 连接超时；改用浏览器可访问的一手资料和说明文档补充判断。
+- `wsdlp46/prototype-html-pin` 本次未能直接访问；已在调研文档中明确标注，未伪装成已读取。
+
+### 暂未解决
+- Step 2 需求确认 / 表单化提问能力尚未开始。
+- 后续若 `wsdlp46/prototype-html-pin` 可访问，应复核编号圆点实现细节。
+
+### 下一步目标
+- Step 2：先确认需求确认表的输出形式、默认轮次、字段范围、推荐/跳过策略和是否沉淀 `requirements.md`，再实现 `built-in-skills/requirement-intake.md`。
+
+### Git 提交
+- Commit: `docs: add reference skill analysis`
+- 分支: `main`
