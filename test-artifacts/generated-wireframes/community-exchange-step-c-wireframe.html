@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>社区闲置交换小程序 Step C 异常状态线框</title>
+  <style>
+    :root {
+      --bg: #f5f6f8;
+      --panel: #ffffff;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #d3d8df;
+      --line-dark: #8b95a1;
+      --soft: #eef1f4;
+      --accent: #2563eb;
+      --accent-soft: #e8f0ff;
+      --warn: #9a5b00;
+      --warn-soft: #fff7e6;
+      --danger: #b42318;
+      --danger-soft: #fff0ee;
+      --ok-soft: #edf7ef;
+      --radius: 8px;
+      --doc-width: 390px;
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button { cursor: pointer; }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--doc-width);
+    }
+
+    .prototype {
+      padding: 20px;
+      overflow: auto;
+    }
+
+    .doc-panel {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      border-left: 1px solid var(--line);
+      background: var(--panel);
+      padding: 18px;
+    }
+
+    .topbar,
+    .workspace,
+    .phone,
+    .card,
+    .doc-item {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: var(--radius);
+    }
+
+    .topbar {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin-bottom: 4px;
+      font-size: 18px;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    p {
+      margin-bottom: 8px;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .toolbar,
+    .state-grid,
+    .chips,
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .ghost-button,
+    .state-button,
+    .primary-button,
+    .secondary-button {
+      min-height: 32px;
+      border: 1px solid var(--line-dark);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      padding: 6px 10px;
+    }
+
+    .primary-button {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .secondary-button {
+      background: var(--soft);
+    }
+
+    .state-button[aria-pressed="true"] {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 250px minmax(330px, 390px) minmax(240px, 1fr);
+      gap: 16px;
+      align-items: start;
+      padding: 16px;
+    }
+
+    .state-nav,
+    .side-note {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 12px;
+    }
+
+    .state-grid {
+      align-items: stretch;
+    }
+
+    .state-button {
+      width: 100%;
+      text-align: left;
+    }
+
+    .phone {
+      position: relative;
+      width: 100%;
+      min-height: 760px;
+      background: #fbfbfc;
+      overflow: hidden;
+    }
+
+    .phone-header {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      border-bottom: 1px solid var(--line);
+      padding: 8px 12px;
+      background: #fff;
+    }
+
+    .screen-title {
+      font-weight: 700;
+    }
+
+    .state-panel {
+      display: none;
+      padding: 12px;
+      padding-bottom: 20px;
+    }
+
+    .state-panel.active {
+      display: block;
+    }
+
+    .card {
+      position: relative;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .placeholder {
+      min-height: 120px;
+      border: 1px dashed var(--line-dark);
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      background: var(--soft);
+      color: var(--muted);
+      margin-bottom: 10px;
+      text-align: center;
+      padding: 12px;
+    }
+
+    .field,
+    .textarea {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 8px 10px;
+      color: var(--ink);
+    }
+
+    .textarea {
+      min-height: 78px;
+      resize: vertical;
+    }
+
+    .field-label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 7px;
+      color: var(--muted);
+      background: #fff;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .tag.strong {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .tag.warn {
+      border-color: var(--warn);
+      color: var(--warn);
+      background: var(--warn-soft);
+    }
+
+    .tag.danger {
+      border-color: var(--danger);
+      color: var(--danger);
+      background: var(--danger-soft);
+    }
+
+    .notice {
+      border: 1px solid var(--warn);
+      border-radius: 6px;
+      background: var(--warn-soft);
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .danger-box {
+      border: 1px solid var(--danger);
+      border-radius: 6px;
+      background: var(--danger-soft);
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .success {
+      border: 1px solid #83b88c;
+      border-radius: 6px;
+      background: var(--ok-soft);
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .skeleton {
+      height: 16px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--soft), #fff, var(--soft));
+      border: 1px solid var(--line);
+      margin: 10px 0;
+    }
+
+    .wire-target {
+      position: relative;
+      outline: 0 solid transparent;
+      transition: background .16s ease, outline-color .16s ease;
+    }
+
+    .wire-target.is-active {
+      outline: 2px solid var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .pin {
+      position: absolute;
+      top: -9px;
+      right: -9px;
+      z-index: 4;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      background: #111827;
+      color: #fff;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 1px var(--line-dark);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    body.hide-pins .pin {
+      display: none;
+    }
+
+    .doc-panel h1 {
+      margin-bottom: 4px;
+    }
+
+    .doc-panel h2 {
+      margin: 18px 0 8px;
+      font-size: 14px;
+    }
+
+    .doc-item {
+      position: relative;
+      margin: 8px 0;
+      padding: 10px 10px 10px 42px;
+    }
+
+    .doc-item::before {
+      content: attr(data-pin);
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: #111827;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .doc-item.is-active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 1120px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+      .phone {
+        max-width: 390px;
+        margin: 0 auto;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .shell {
+        display: block;
+      }
+      .prototype {
+        padding: 12px;
+      }
+      .doc-panel {
+        position: static;
+        height: auto;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="prototype" aria-label="Step C 异常状态线框">
+      <div class="topbar">
+        <div>
+          <h1>社区闲置交换小程序｜Step C 异常状态</h1>
+          <p class="small">单手机容器内切换异常状态。本步验证空、加载、举报、取消/爽约、下架、认证失败。</p>
+        </div>
+        <div class="toolbar">
+          <button class="ghost-button" type="button" data-toggle-pins>隐藏标注</button>
+          <button class="ghost-button" type="button" data-reset>重置状态</button>
+        </div>
+      </div>
+
+      <div class="workspace">
+        <aside class="state-nav" aria-label="异常状态导航">
+          <h2>异常状态</h2>
+          <p class="small">点击查看对应页面处理方式。</p>
+          <div class="state-grid">
+            <button class="state-button" type="button" data-state-button="empty" aria-pressed="true">空状态：附近暂无闲置</button>
+            <button class="state-button" type="button" data-state-button="loading" aria-pressed="false">加载中：列表刷新</button>
+            <button class="state-button" type="button" data-state-button="report" aria-pressed="false">举报：轻量提交</button>
+            <button class="state-button" type="button" data-state-button="cancel" aria-pressed="false">取消 / 爽约提醒</button>
+            <button class="state-button" type="button" data-state-button="removed" aria-pressed="false">下架：内容不可访问</button>
+            <button class="state-button" type="button" data-state-button="verifyFail" aria-pressed="false">认证失败：可修正</button>
+          </div>
+        </aside>
+
+        <section class="phone" aria-label="异常状态手机线框">
+          <div class="phone-header">
+            <span class="screen-title" data-state-title>附近暂无闲置</span>
+            <span class="small">微信小程序</span>
+          </div>
+
+          <section class="state-panel active" data-state="empty">
+            <div class="card wire-target" data-anno="1" tabindex="0">
+              <span class="pin">1</span>
+              <div class="placeholder">附近 3km 暂无符合条件的闲置</div>
+              <h3>空状态</h3>
+              <p class="small">说明当前筛选太窄或附近暂时没有内容，引导用户放宽范围或发布自己的闲置。</p>
+              <div class="actions">
+                <button class="secondary-button" type="button">放宽到 5km</button>
+                <button class="primary-button" type="button">发布闲置</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="state-panel" data-state="loading">
+            <div class="card wire-target" data-anno="2" tabindex="0">
+              <span class="pin">2</span>
+              <h3>列表加载中</h3>
+              <div class="skeleton" style="width:88%;"></div>
+              <div class="skeleton" style="width:64%;"></div>
+              <div class="skeleton" style="width:92%;"></div>
+              <div class="skeleton" style="width:70%;"></div>
+              <p class="small">刷新附近闲置时保留页面结构，避免用户误以为内容消失。</p>
+            </div>
+          </section>
+
+          <section class="state-panel" data-state="report">
+            <div class="card wire-target" data-anno="3" tabindex="0">
+              <span class="pin">3</span>
+              <h3>举报物品</h3>
+              <label class="field-label">问题类型</label>
+              <div class="chips">
+                <span class="tag strong">疑似违规</span>
+                <span class="tag">虚假描述</span>
+                <span class="tag">危险物品</span>
+              </div>
+              <label class="field-label">补充说明</label>
+              <textarea class="textarea">请描述你发现的问题，平台只处理违规、封禁和下架，不做资金裁决。</textarea>
+              <button class="primary-button" type="button" data-submit-report>提交举报</button>
+            </div>
+            <div class="success hidden" data-report-success>
+              <strong>举报已提交</strong>
+              <p class="small">平台会记录并评估，必要时下架内容或限制账号。</p>
+            </div>
+          </section>
+
+          <section class="state-panel" data-state="cancel">
+            <div class="card wire-target" data-anno="4" tabindex="0">
+              <span class="pin">4</span>
+              <h3>取消预约</h3>
+              <p class="small">预约时间：今天 19:00-20:00，状态：等待确认。</p>
+              <label class="field-label">取消原因</label>
+              <input class="field" value="临时有事，无法按时到达">
+              <div class="notice">
+                <strong>守约提醒</strong>
+                <p class="small">提前取消不会公开惩罚；多次无故爽约可能影响完成记录和平台限制。</p>
+              </div>
+              <button class="secondary-button" type="button" data-submit-cancel>确认取消</button>
+            </div>
+            <div class="success hidden" data-cancel-success>
+              <strong>已取消预约</strong>
+              <p class="small">已通知对方，建议重新协商新的自提时间。</p>
+            </div>
+          </section>
+
+          <section class="state-panel" data-state="removed">
+            <div class="danger-box wire-target" data-anno="5" tabindex="0">
+              <span class="pin">5</span>
+              <h3>内容已下架</h3>
+              <p class="small">该物品因过期、发布者主动下架或平台违规处理，暂不可查看。</p>
+              <div class="chips">
+                <span class="tag danger">不可预约</span>
+                <span class="tag">保留协商记录</span>
+              </div>
+              <div class="actions" style="margin-top:10px;">
+                <button class="secondary-button" type="button">返回广场</button>
+                <button class="secondary-button" type="button">查看相似物品</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="state-panel" data-state="verifyFail">
+            <div class="card wire-target" data-anno="6" tabindex="0">
+              <span class="pin">6</span>
+              <h3>小区认证未通过</h3>
+              <p class="small">原因：认证材料无法证明当前社区范围。请更换物业住户码或社区邀请链接。</p>
+              <label class="field-label">重新提交材料</label>
+              <input class="field" value="上传新的认证材料">
+              <div class="notice">
+                <strong>隐私说明</strong>
+                <p class="small">认证材料仅用于审核，前台只展示认证状态，不展示真实住址或材料内容。</p>
+              </div>
+              <button class="primary-button" type="button" data-submit-verify>重新提交</button>
+            </div>
+            <div class="success hidden" data-verify-success>
+              <strong>已重新提交</strong>
+              <p class="small">审核中，完成后会更新“小区认证”状态。</p>
+            </div>
+          </section>
+        </section>
+
+        <aside class="side-note">
+          <h2>当前状态说明</h2>
+          <p class="small" data-live-note>空状态需要提供明确原因和下一步行动，不能只留白。</p>
+          <h2>本步边界</h2>
+          <p class="small">本步只描述异常状态的界面表达和反馈，不展开完整后台审核、仲裁流程或处罚算法。</p>
+        </aside>
+      </div>
+    </section>
+
+    <aside class="doc-panel" aria-label="右侧说明文档">
+      <h1>右侧说明文档</h1>
+      <p class="small">Step C 用于补齐主要异常状态，确保真实小程序流程不只覆盖理想路径。</p>
+
+      <h2>原型说明</h2>
+      <p class="small">通过状态切换查看空、加载、举报、取消/爽约、下架、认证失败。仍是低保真线框，不表达最终视觉。</p>
+
+      <h2>功能说明</h2>
+      <p class="small">异常状态要说明原因、给出可恢复操作，并保持平台边界：处理违规和账号限制，不承诺交易裁决或资金担保。</p>
+
+      <h2>字段说明</h2>
+      <p class="small">涉及筛选范围、举报类型、举报说明、取消原因、下架原因、认证失败原因、重新提交材料等字段。</p>
+
+      <h2>交互说明</h2>
+      <p class="small">左侧状态按钮切换手机内状态；举报、取消、重新认证会触发成功反馈；隐藏标注可检查页面本体。</p>
+
+      <h2>编号标注</h2>
+      <div class="doc-item" data-anno="1" data-pin="1" tabindex="0"><strong>空状态</strong><br>说明为什么没有内容，并提供放宽范围或发布闲置两个可行动选项。</div>
+      <div class="doc-item" data-anno="2" data-pin="2" tabindex="0"><strong>加载状态</strong><br>保留页面骨架，降低用户对内容突然消失的困惑。</div>
+      <div class="doc-item" data-anno="3" data-pin="3" tabindex="0"><strong>举报提交</strong><br>举报只覆盖违规处理、下架和账号限制，不承诺资金裁决。</div>
+      <div class="doc-item" data-anno="4" data-pin="4" tabindex="0"><strong>取消 / 爽约</strong><br>提前取消应可恢复、可解释；多次爽约才进入平台限制，不做公开羞辱。</div>
+      <div class="doc-item" data-anno="5" data-pin="5" tabindex="0"><strong>下架不可访问</strong><br>下架后保留协商记录，但禁止继续预约，引导返回或查看相似物品。</div>
+      <div class="doc-item" data-anno="6" data-pin="6" tabindex="0"><strong>认证失败</strong><br>给出失败原因和重新提交入口，强调认证材料不在前台展示。</div>
+
+      <h2>验收点</h2>
+      <p class="small">检查异常状态是否都有原因、下一步和风险边界；检查没有公开惩罚、精确住址、支付担保或完整仲裁暗示。</p>
+    </aside>
+  </main>
+
+  <script>
+    const stateTitles = {
+      empty: '附近暂无闲置',
+      loading: '正在刷新',
+      report: '举报物品',
+      cancel: '取消预约',
+      removed: '内容已下架',
+      verifyFail: '认证未通过'
+    };
+
+    const stateNotes = {
+      empty: '空状态需要提供明确原因和下一步行动，不能只留白。',
+      loading: '加载状态保留页面骨架，避免用户以为内容丢失。',
+      report: '举报状态强调平台处理违规，不做资金担保或交易裁决。',
+      cancel: '取消和爽约提醒应温和可恢复，不做公开羞辱。',
+      removed: '下架状态禁止继续预约，但保留必要协商记录入口。',
+      verifyFail: '认证失败要给出可修正路径，并保护认证材料隐私。'
+    };
+
+    function syncActive(id, on) {
+      document.querySelectorAll('[data-anno="' + id + '"]').forEach((node) => {
+        node.classList.toggle('is-active', on);
+      });
+    }
+
+    function showState(name) {
+      document.querySelectorAll('[data-state]').forEach((panel) => {
+        panel.classList.toggle('active', panel.dataset.state === name);
+      });
+      document.querySelectorAll('[data-state-button]').forEach((button) => {
+        button.setAttribute('aria-pressed', button.dataset.stateButton === name ? 'true' : 'false');
+      });
+      document.querySelector('[data-state-title]').textContent = stateTitles[name];
+      document.querySelector('[data-live-note]').textContent = stateNotes[name];
+    }
+
+    document.querySelectorAll('[data-anno]').forEach((node) => {
+      const id = node.getAttribute('data-anno');
+      node.addEventListener('mouseenter', () => syncActive(id, true));
+      node.addEventListener('mouseleave', () => syncActive(id, false));
+      node.addEventListener('focusin', () => syncActive(id, true));
+      node.addEventListener('focusout', () => syncActive(id, false));
+    });
+
+    document.querySelectorAll('[data-state-button]').forEach((button) => {
+      button.addEventListener('click', () => showState(button.dataset.stateButton));
+    });
+
+    document.querySelector('[data-toggle-pins]').addEventListener('click', (event) => {
+      document.body.classList.toggle('hide-pins');
+      event.currentTarget.textContent = document.body.classList.contains('hide-pins') ? '显示标注' : '隐藏标注';
+    });
+
+    document.querySelector('[data-submit-report]').addEventListener('click', () => {
+      document.querySelector('[data-report-success]').classList.remove('hidden');
+    });
+
+    document.querySelector('[data-submit-cancel]').addEventListener('click', () => {
+      document.querySelector('[data-cancel-success]').classList.remove('hidden');
+    });
+
+    document.querySelector('[data-submit-verify]').addEventListener('click', () => {
+      document.querySelector('[data-verify-success]').classList.remove('hidden');
+    });
+
+    document.querySelector('[data-reset]').addEventListener('click', () => {
+      showState('empty');
+      document.body.classList.remove('hide-pins');
+      document.querySelector('[data-toggle-pins]').textContent = '隐藏标注';
+      document.querySelector('[data-report-success]').classList.add('hidden');
+      document.querySelector('[data-cancel-success]').classList.add('hidden');
+      document.querySelector('[data-verify-success]').classList.add('hidden');
+    });
+  </script>
+</body>
+</html>

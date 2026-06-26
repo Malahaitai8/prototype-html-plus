@@ -176,3 +176,85 @@
 ### Git 提交
 - Commit: `docs: add requirement intake workflow`
 - 分支: `main`
+
+## 2026-06-26 17:18 - Step 3 Generic Wireframe Mode
+
+### 本次完成
+- 新增 `skills/prototype-html-plus/built-in-skills/wireframe.md`，定义通用线框稿能力。
+- 新增 `skills/prototype-html-plus/starter-components/wireframe-template.html`，提供零外部依赖的单文件 HTML 骨架。
+- 新增两个线框示例：
+  - `skills/prototype-html-plus/examples/01-wireframe-demo/b-side-data-dashboard.html`
+  - `skills/prototype-html-plus/examples/01-wireframe-demo/c-side-ai-fitness-app.html`
+- 新增 `skills/prototype-html-plus/test-prompts/03-wireframe-test.md`，用于验证 B 端 / C 端泛化能力。
+- 更新 `skills/prototype-html-plus/SKILL.md`，将已确认需求后的低保真线框稿路由到 `wireframe.md`。
+- 更新 `DECISIONS.md`，记录 Step 3 关键取舍。
+- 根据用户反馈，补充一个全新端到端测试场景：社区闲置交换小程序，从模糊需求挖掘一直测到 Step A 线框稿生成。
+- 补充自适应结构规则：线框稿应根据 PRD、平台、领域、信息形态和主行为选择结构，并按场景加载相关设计参考，不应让所有产品长成同一种样式。
+- 根据测试反馈，补充移动 / 小程序线框呈现方式规则：支持多屏流程总览和单屏可交互容器；单屏请求不得丢失已确认需求，空间不足时必须建议拆分子步骤。
+- 将根目录测试生成的 `*-wireframe.html` 加入 `.gitignore`，避免测试产物误入 Git。
+- 根据用户关于长上下文的反馈，补充迭代记忆保护规则：多轮微调后需要回看当前 PRD step、呈现方式、验收目标和 Skill 基线。
+- 将真实测试线程生成的 HTML 移到 `test-artifacts/generated-wireframes/`，作为非安装 Skill 的参考产物提交。
+
+### 当前效果
+- 线框稿能力被定义为通用能力，不绑定任何固定业务。
+- 生成前必须已有已确认 PRD Lite、当前步骤、端型 / 平台、设计原则与风险边界。
+- 线框稿默认只做 PRD 分步计划中的当前步骤，完成后等待用户验收。
+- 线框稿必须包含右侧说明文档、编号圆点标注、标注显隐、双向 hover / focus 高亮和至少一个基础交互。
+- 示例明确写明：demo 仅展示机制和结构差异，不是固定业务模板。
+- 测试 Prompt 现在同时覆盖“已确认 PRD 直接生成线框稿”和“全新模糊需求端到端生成线框稿”两类情况。
+- 移动线框稿现在要求说明呈现方式，并做当前步骤需求覆盖检查。
+- 长时间微调时，Skill 要求 Agent 不只凭上下文记忆继续改，而要在必要时重读当前 HTML / 需求记录并复核基线。
+- 测试输出样例被隔离在 `test-artifacts/generated-wireframes/`，不会进入 `skills/prototype-html-plus/` 的安装目录。
+
+### 测试方式
+- 本地启动静态服务：
+  - `http://127.0.0.1:4311/skills/prototype-html-plus/starter-components/wireframe-template.html`
+  - `http://127.0.0.1:4311/skills/prototype-html-plus/examples/01-wireframe-demo/b-side-data-dashboard.html`
+  - `http://127.0.0.1:4311/skills/prototype-html-plus/examples/01-wireframe-demo/c-side-ai-fitness-app.html`
+- 检查三个 HTML 是否可通过本地 HTTP 加载。
+- 检查无外部 CDN / 远程资源依赖。
+- 检查右侧说明是否包含原型说明、功能说明、字段说明、交互说明、验收点。
+- 检查编号圆点数量、标注显隐、双向 hover / focus 事件钩子。
+- 检查 B 端示例是否包含桌面结构线框特征：侧边栏、筛选、表格、详情。
+- 检查 C 端示例是否包含移动流程线框特征：手机容器、打卡、状态切换、底部导航、宠物状态。
+- 检查测试 Prompt 是否包含全新业务，并明确要求按平台 / 端型 / 参考路由自适应结构。
+- 检查单屏移动原型规则是否要求保留上一轮确认需求，不能因屏幕限制丢需求。
+- 检查 `.gitignore` 是否忽略根目录测试线框产物。
+- 检查长上下文保护规则是否写入 `SKILL.md` 和 `wireframe.md`。
+- 检查真实测试 HTML 是否移动到非 Skill 目录，并可被 Git 跟踪。
+- 执行 HTML 内联脚本语法检查。
+- 执行 `git diff --check`。
+
+### 测试结果
+- 三个 HTML 均通过本地 HTTP 加载，返回 200。
+- 无外部 CDN / 远程资源依赖。
+- 模板包含 5 个编号圆点，B 端 demo 包含 4 个编号圆点，C 端 demo 包含 5 个编号圆点。
+- 三个 HTML 均包含说明区标题、标注显隐按钮、`mouseenter` / `mouseleave` / `focusin` / `focusout` 双向高亮钩子。
+- B 端 demo 通过桌面结构特征检查。
+- C 端 demo 通过移动流程特征检查。
+- `03-wireframe-test.md` 已补充社区闲置交换小程序端到端测试，避免只围绕已有两个 demo 验证。
+- `wireframe.md` 已补充自适应结构与参考路由规则，避免所有产品输出同一种布局。
+- `wireframe.md` 已补充移动呈现方式和需求覆盖规则，避免单屏原型漏掉已确认需求。
+- `SKILL.md` 和 `wireframe.md` 已补充长上下文 / 多轮微调保护规则。
+- 根目录测试产物已移动到 `test-artifacts/generated-wireframes/`，作为可提交的非安装参考样例。
+- `.gitignore` 已改为只忽略根目录临时 `/*-wireframe.html`，不会忽略 `test-artifacts/generated-wireframes/` 下的参考样例。
+- 8 个 HTML 均通过本地 HTTP 加载：3 个 Skill template/demo + 5 个真实测试样例。
+- 8 个 HTML 内联脚本语法检查通过。
+- 已确认 Skill demo 和测试样例中没有本地绝对路径或远程资源依赖模式。
+- `git diff --check` 通过；仅有 Windows 行尾转换提示，无空白错误。
+
+### 遇到的问题 / 瓶颈
+- 系统 PATH 中没有 `python`，已改用 Codex bundled Python 启动本地静态服务。
+- 内置浏览器运行时被沙箱权限挡住，无法完成 in-app browser 自动点击验证。
+- 本机 Chrome / Edge headless 在当前环境下没有输出 DOM，也没有生成截图文件；因此本步自动验证以 HTTP 加载、静态结构、事件钩子和脚本语法为主，视觉与点击验收需通过本地 URL 人工确认。
+
+### 暂未解决
+- 尚未提交 / 推送，等待用户验收 Step 3 产物。
+- 用户确认后，需要在提交前再次检查 `PROGRESS.md`、运行 `git status --short`，再 commit / push。
+
+### 下一步目标
+- 用户验收后提交 Step 3。
+- 进入 Step 4 前，先确认高保真能力或下一项 V1 能力的具体规则。
+
+### Git 提交
+- 待用户确认后提交。

@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wireframe Template - prototype-html-plus</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #cfd4dc;
+      --line-dark: #8b95a1;
+      --soft: #eef1f5;
+      --accent: #2f6fed;
+      --accent-soft: #e9f0ff;
+      --warn: #f59e0b;
+      --radius: 8px;
+      --doc-width: 360px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--doc-width);
+    }
+
+    .prototype {
+      padding: 20px;
+      overflow: auto;
+    }
+
+    .doc-panel {
+      border-left: 1px solid var(--line);
+      background: var(--panel);
+      padding: 18px;
+      overflow: auto;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .topbar,
+    .section,
+    .card,
+    .placeholder,
+    .doc-item {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: var(--radius);
+    }
+
+    .topbar {
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+
+    .title-block h1,
+    .doc-panel h1 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .title-block p,
+    .doc-panel p {
+      margin: 4px 0 0;
+      color: var(--muted);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    button,
+    .chip,
+    .field {
+      border: 1px solid var(--line-dark);
+      background: #fff;
+      border-radius: 6px;
+      min-height: 32px;
+      padding: 6px 10px;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button[aria-pressed="true"],
+    .chip.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .card {
+      min-height: 104px;
+      padding: 14px;
+      position: relative;
+    }
+
+    .card strong {
+      display: block;
+      font-size: 22px;
+      margin-top: 8px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    .section {
+      padding: 14px;
+      min-height: 260px;
+      position: relative;
+    }
+
+    .section h2 {
+      margin: 0 0 12px;
+      font-size: 15px;
+    }
+
+    .placeholder {
+      background: repeating-linear-gradient(
+        -45deg,
+        #fff,
+        #fff 8px,
+        var(--soft) 8px,
+        var(--soft) 16px
+      );
+      min-height: 44px;
+      margin: 8px 0;
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      color: var(--muted);
+    }
+
+    .table {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr .8fr .8fr;
+      gap: 8px;
+      padding: 10px;
+      border-top: 1px solid var(--line);
+      align-items: center;
+    }
+
+    .row:first-child {
+      border-top: 0;
+      background: var(--soft);
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .wire-target {
+      position: relative;
+      outline: 0 solid transparent;
+      transition: background .16s ease, outline-color .16s ease;
+    }
+
+    .wire-target.is-active {
+      outline: 2px solid var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .pin {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      background: #111827;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 1px var(--line-dark);
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      z-index: 2;
+    }
+
+    body.hide-pins .pin { display: none; }
+
+    .doc-panel h2 {
+      font-size: 14px;
+      margin: 18px 0 8px;
+    }
+
+    .doc-item {
+      padding: 10px 10px 10px 42px;
+      margin: 8px 0;
+      position: relative;
+    }
+
+    .doc-item::before {
+      content: attr(data-pin);
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: #111827;
+      color: #fff;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .doc-item.is-active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 920px) {
+      .shell {
+        display: block;
+      }
+      .prototype {
+        padding: 12px;
+      }
+      .doc-panel {
+        position: static;
+        height: auto;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+      .grid,
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="prototype" aria-label="prototype wireframe">
+      <div class="topbar">
+        <div class="title-block">
+          <h1>通用线框稿模板</h1>
+          <p>替换这里的模块和文案，以匹配已确认的 PRD Lite 当前步骤。</p>
+        </div>
+        <div class="toolbar">
+          <button type="button" data-toggle-pins>隐藏标注</button>
+          <button type="button" class="tab active" data-tab="overview" aria-pressed="true">总览</button>
+          <button type="button" class="tab" data-tab="details" aria-pressed="false">详情</button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <article class="card wire-target" data-anno="1">
+          <span class="pin">1</span>
+          <span class="small">关键指标</span>
+          <strong>模块 A</strong>
+          <p>用于展示当前步骤最重要的状态。</p>
+        </article>
+        <article class="card wire-target" data-anno="2">
+          <span class="pin">2</span>
+          <span class="small">主任务</span>
+          <strong>模块 B</strong>
+          <p>承载用户当前要完成的动作。</p>
+        </article>
+        <article class="card wire-target" data-anno="3">
+          <span class="pin">3</span>
+          <span class="small">反馈</span>
+          <strong>模块 C</strong>
+          <p>展示系统响应和下一步提示。</p>
+        </article>
+      </div>
+
+      <div class="layout">
+        <aside class="section wire-target" data-anno="4">
+          <span class="pin">4</span>
+          <h2>筛选 / 步骤 / 导航</h2>
+          <button type="button" class="chip active">当前</button>
+          <button type="button" class="chip">待处理</button>
+          <button type="button" class="chip">已完成</button>
+          <div class="placeholder">这里放筛选条件、步骤导航或主流程节点</div>
+          <div class="placeholder">这里放说明或次级操作</div>
+        </aside>
+
+        <section class="section wire-target" data-anno="5">
+          <span class="pin">5</span>
+          <h2>主内容区</h2>
+          <div data-panel="overview">
+            <div class="field">筛选输入 / 搜索条件</div>
+            <div class="table">
+              <div class="row"><span>名称</span><span>状态</span><span>负责人</span><span>操作</span></div>
+              <div class="row"><span>记录 1</span><span>进行中</span><span>角色 A</span><button type="button" data-expand>展开</button></div>
+              <div class="row"><span>记录 2</span><span>待确认</span><span>角色 B</span><button type="button" data-expand>展开</button></div>
+            </div>
+          </div>
+          <div class="hidden" data-panel="details">
+            <div class="placeholder">详情区域：字段、状态、说明、下一步操作</div>
+            <div class="placeholder">验收或风险提示</div>
+          </div>
+          <div class="placeholder hidden" data-expanded>展开内容：用于验证交互逻辑，不代表最终 UI。</div>
+        </section>
+      </div>
+    </section>
+
+    <aside class="doc-panel" aria-label="wireframe documentation">
+      <h1>右侧说明文档</h1>
+      <p>该模板展示说明面板结构。生成用户原型时必须替换为对应 PRD 内容。</p>
+
+      <h2>原型说明</h2>
+      <p>线框稿用于验证结构、路径和交互，不用于表达最终视觉。</p>
+
+      <h2>功能说明</h2>
+      <p class="small">说明当前步骤内用户可以完成的功能，不展开后续步骤。</p>
+
+      <h2>字段说明</h2>
+      <p class="small">列出当前步骤涉及的核心字段、状态和数据来源。</p>
+
+      <h2>交互说明</h2>
+      <p class="small">说明 Tab、筛选、展开、状态反馈等交互如何改变页面内容。</p>
+
+      <h2>编号标注</h2>
+      <div class="doc-item" data-anno="1" data-pin="1"><strong>关键指标</strong><br>解释页面最重要的状态或结果。</div>
+      <div class="doc-item" data-anno="2" data-pin="2"><strong>主任务</strong><br>说明用户当前要完成的核心动作。</div>
+      <div class="doc-item" data-anno="3" data-pin="3"><strong>系统反馈</strong><br>说明状态、提示和下一步引导。</div>
+      <div class="doc-item" data-anno="4" data-pin="4"><strong>导航 / 筛选</strong><br>说明信息如何被组织和切换。</div>
+      <div class="doc-item" data-anno="5" data-pin="5"><strong>主内容区</strong><br>说明主要数据、列表或流程内容。</div>
+
+      <h2>验收点</h2>
+      <p class="small">替换模板时，检查是否只做当前 PRD 步骤、是否包含说明和标注、交互是否可用。</p>
+    </aside>
+  </main>
+
+  <script>
+    const syncActive = (id, on) => {
+      document.querySelectorAll(`[data-anno="${id}"]`).forEach((node) => {
+        node.classList.toggle('is-active', on);
+      });
+    };
+
+    document.querySelectorAll('[data-anno]').forEach((node) => {
+      const id = node.getAttribute('data-anno');
+      node.addEventListener('mouseenter', () => syncActive(id, true));
+      node.addEventListener('mouseleave', () => syncActive(id, false));
+      node.addEventListener('focusin', () => syncActive(id, true));
+      node.addEventListener('focusout', () => syncActive(id, false));
+    });
+
+    document.querySelector('[data-toggle-pins]').addEventListener('click', (event) => {
+      document.body.classList.toggle('hide-pins');
+      event.currentTarget.textContent = document.body.classList.contains('hide-pins') ? '显示标注' : '隐藏标注';
+    });
+
+    document.querySelectorAll('.tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach((item) => {
+          item.classList.toggle('active', item === tab);
+          item.setAttribute('aria-pressed', item === tab ? 'true' : 'false');
+        });
+        document.querySelectorAll('[data-panel]').forEach((panel) => {
+          panel.classList.toggle('hidden', panel.getAttribute('data-panel') !== tab.dataset.tab);
+        });
+      });
+    });
+
+    document.querySelectorAll('[data-expand]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const expanded = document.querySelector('[data-expanded]');
+        expanded.classList.toggle('hidden');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,983 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>社区闲置交换小程序 Step B 扩展交互线框</title>
+  <style>
+    :root {
+      --bg: #f5f6f8;
+      --panel: #ffffff;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #d3d8df;
+      --line-dark: #8b95a1;
+      --soft: #eef1f4;
+      --accent: #2563eb;
+      --accent-soft: #e8f0ff;
+      --ok-soft: #edf7ef;
+      --warn-soft: #fff7e6;
+      --warn-line: #d99a20;
+      --radius: 8px;
+      --doc-width: 390px;
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--doc-width);
+    }
+
+    .prototype {
+      padding: 20px;
+      overflow: auto;
+    }
+
+    .doc-panel {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      border-left: 1px solid var(--line);
+      background: var(--panel);
+      padding: 18px;
+    }
+
+    .topbar,
+    .workspace,
+    .phone,
+    .card,
+    .doc-item {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: var(--radius);
+    }
+
+    .topbar {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin-bottom: 4px;
+      font-size: 18px;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    p {
+      margin-bottom: 8px;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .toolbar,
+    .nav-row,
+    .chips,
+    .meta-row,
+    .segmented,
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .ghost-button,
+    .primary-button,
+    .secondary-button,
+    .nav-chip,
+    .chip,
+    .seg-button,
+    .tab-button {
+      min-height: 32px;
+      border: 1px solid var(--line-dark);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      padding: 6px 10px;
+    }
+
+    .primary-button {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .secondary-button {
+      background: var(--soft);
+    }
+
+    .nav-chip[aria-pressed="true"],
+    .seg-button[aria-pressed="true"],
+    .tab-button[aria-pressed="true"],
+    .chip.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 220px minmax(330px, 390px) minmax(240px, 1fr);
+      gap: 16px;
+      align-items: start;
+      padding: 16px;
+    }
+
+    .flow-map {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .flow-map ol {
+      margin: 10px 0 0;
+      padding-left: 20px;
+    }
+
+    .flow-map li {
+      margin-bottom: 8px;
+    }
+
+    .phone {
+      position: relative;
+      width: 100%;
+      min-height: 760px;
+      background: #fbfbfc;
+      overflow: hidden;
+    }
+
+    .phone-header {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      border-bottom: 1px solid var(--line);
+      padding: 8px 12px;
+      background: #fff;
+    }
+
+    .screen-title {
+      font-weight: 700;
+    }
+
+    .screen {
+      display: none;
+      padding: 12px;
+      padding-bottom: 78px;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .bottom-nav {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .bottom-nav button {
+      min-height: 58px;
+      border: 0;
+      border-right: 1px solid var(--line);
+      background: #fff;
+      color: var(--muted);
+    }
+
+    .bottom-nav button:last-child {
+      border-right: 0;
+    }
+
+    .bottom-nav button[aria-pressed="true"] {
+      color: var(--accent);
+      background: var(--accent-soft);
+      font-weight: 700;
+    }
+
+    .field,
+    .select,
+    .textarea {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 8px 10px;
+      color: var(--ink);
+    }
+
+    .textarea {
+      min-height: 74px;
+      resize: vertical;
+    }
+
+    .field-label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .card {
+      position: relative;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .item-card {
+      display: grid;
+      grid-template-columns: 62px minmax(0, 1fr);
+      gap: 10px;
+      text-align: left;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .item-card.favorite {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .thumb,
+    .upload-box {
+      border: 1px dashed var(--line-dark);
+      border-radius: 4px;
+      display: grid;
+      place-items: center;
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .thumb {
+      width: 62px;
+      height: 62px;
+    }
+
+    .upload-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .upload-box {
+      aspect-ratio: 1 / 1;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 7px;
+      color: var(--muted);
+      background: #fff;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .tag.strong {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .tag.warn {
+      border-color: var(--warn-line);
+      background: var(--warn-soft);
+      color: #835000;
+    }
+
+    .notice {
+      border: 1px solid var(--warn-line);
+      border-radius: 6px;
+      background: var(--warn-soft);
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .success {
+      border: 1px solid #83b88c;
+      border-radius: 6px;
+      background: var(--ok-soft);
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .message-card {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .bubble {
+      max-width: 86%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px;
+      margin: 8px 0;
+      background: #fff;
+    }
+
+    .bubble.me {
+      margin-left: auto;
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .identity-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 8px;
+      background: #fff;
+    }
+
+    .side-note {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 12px;
+    }
+
+    .side-note h2 {
+      margin-bottom: 8px;
+    }
+
+    .wire-target {
+      position: relative;
+      outline: 0 solid transparent;
+      transition: background .16s ease, outline-color .16s ease;
+    }
+
+    .wire-target.is-active {
+      outline: 2px solid var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .pin {
+      position: absolute;
+      top: -9px;
+      right: -9px;
+      z-index: 4;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      background: #111827;
+      color: #fff;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 1px var(--line-dark);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    body.hide-pins .pin {
+      display: none;
+    }
+
+    .doc-panel h1 {
+      margin-bottom: 4px;
+    }
+
+    .doc-panel h2 {
+      margin: 18px 0 8px;
+      font-size: 14px;
+    }
+
+    .doc-item {
+      position: relative;
+      margin: 8px 0;
+      padding: 10px 10px 10px 42px;
+    }
+
+    .doc-item::before {
+      content: attr(data-pin);
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: #111827;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .doc-item.is-active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 1120px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+      .phone {
+        max-width: 390px;
+        margin: 0 auto;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .shell {
+        display: block;
+      }
+      .prototype {
+        padding: 12px;
+      }
+      .doc-panel {
+        position: static;
+        height: auto;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="prototype" aria-label="Step B 扩展交互线框">
+      <div class="topbar">
+        <div>
+          <h1>社区闲置交换小程序｜Step B 扩展交互</h1>
+          <p class="small">单手机容器内可交互跳转。本步只覆盖发布闲置、筛选收藏、消息协商、可信身份入口。</p>
+        </div>
+        <div class="toolbar">
+          <button class="ghost-button" type="button" data-toggle-pins>隐藏标注</button>
+          <button class="ghost-button" type="button" data-reset>重置状态</button>
+        </div>
+      </div>
+
+      <div class="workspace">
+        <aside class="flow-map" aria-label="流程导航">
+          <h2>Step B 节点</h2>
+          <p class="small">点击节点可快速跳到对应小程序页面。</p>
+          <div class="nav-row">
+            <button class="nav-chip" type="button" data-jump="home" aria-pressed="true">广场</button>
+            <button class="nav-chip" type="button" data-jump="detail" aria-pressed="false">详情</button>
+            <button class="nav-chip" type="button" data-jump="publish" aria-pressed="false">发布</button>
+            <button class="nav-chip" type="button" data-jump="messages" aria-pressed="false">消息</button>
+            <button class="nav-chip" type="button" data-jump="profile" aria-pressed="false">我的</button>
+          </div>
+          <ol>
+            <li>用户从广场调整筛选并收藏目标物品。</li>
+            <li>进入发布页，补齐图片、方式、自提范围和隐私提示。</li>
+            <li>消息页承载协商，不直接展示手机号或精确地址。</li>
+            <li>我的页进入实名和小区认证，提升可信度。</li>
+          </ol>
+        </aside>
+
+        <section class="phone" aria-label="可交互小程序线框">
+          <div class="phone-header">
+            <span class="screen-title" data-screen-title>附近闲置</span>
+            <span class="small">微信小程序</span>
+          </div>
+
+          <section class="screen active" data-screen="home">
+            <div class="field" style="color: var(--muted);">搜索物品、类目或小区关键词</div>
+
+            <div class="card wire-target" data-anno="1" tabindex="0">
+              <span class="pin">1</span>
+              <h3>筛选与收藏</h3>
+              <div class="segmented">
+                <button class="seg-button" type="button" data-filter="all" aria-pressed="true">推荐</button>
+                <button class="seg-button" type="button" data-filter="swap" aria-pressed="false">交换</button>
+                <button class="seg-button" type="button" data-filter="low" aria-pressed="false">低价</button>
+                <button class="seg-button" type="button" data-filter="free" aria-pressed="false">免费</button>
+              </div>
+              <div class="chips" style="margin-top:8px;">
+                <span class="chip active">3km 内</span>
+                <span class="chip" data-certified-chip>只看认证邻居</span>
+                <span class="chip">可今天自提</span>
+              </div>
+            </div>
+
+            <button class="item-card favorite" type="button" data-open-detail="chair">
+              <span class="thumb">图片</span>
+              <span>
+                <strong>儿童餐椅</strong> <span class="tag strong">已收藏</span><br>
+                <span class="small">交换｜600m｜实名 + 小区认证</span><br>
+                <span class="tag">希望换绘本</span> <span class="tag">今天可约</span>
+              </span>
+            </button>
+
+            <button class="item-card" type="button" data-open-detail="lamp">
+              <span class="thumb">图片</span>
+              <span>
+                <strong>书桌台灯</strong> <span class="tag">低价</span><br>
+                <span class="small">线下协商｜1.2km｜待小区认证</span><br>
+                <span class="tag">功能正常</span> <span class="tag">公共点自提</span>
+              </span>
+            </button>
+
+            <div class="card">
+              <h3>收藏后的下一步</h3>
+              <p class="small">收藏不代表预约成功。用户仍需在详情或消息中确认交换条件和自提时间。</p>
+              <button class="primary-button" type="button" data-jump="messages">去消息协商</button>
+            </div>
+          </section>
+
+          <section class="screen" data-screen="detail">
+            <div class="card">
+              <button class="secondary-button" type="button" data-jump="home">返回广场</button>
+            </div>
+
+            <div class="card wire-target" data-anno="1" tabindex="0">
+              <span class="pin">1</span>
+              <div class="upload-box" style="height:150px; aspect-ratio:auto; margin-bottom:10px;">物品图片占位</div>
+              <h3 data-detail-title>儿童餐椅</h3>
+              <div class="meta-row">
+                <span class="tag strong" data-detail-mode>交换</span>
+                <span class="tag" data-detail-distance>600m</span>
+                <span class="tag" data-detail-condition>九成新</span>
+              </div>
+              <p class="small" data-detail-desc>家里孩子长大后闲置，希望换一套 3-5 岁绘本。可在小区北门公共取物点自提。</p>
+            </div>
+
+            <div class="card">
+              <h3>发布者可信信息</h3>
+              <div class="chips">
+                <span class="tag strong">实名已核验</span>
+                <span class="tag strong">小区认证</span>
+                <span class="tag">完成 8 次</span>
+              </div>
+              <p class="small">仅展示必要可信状态，不展示真实姓名、手机号或门牌号。</p>
+            </div>
+
+            <div class="notice">
+              <strong>线下协商边界</strong>
+              <p class="small">低价转让和交换都不提供线上支付或资金担保。建议在公共区域完成自提。</p>
+            </div>
+
+            <div class="actions">
+              <button class="secondary-button" type="button" data-toggle-favorite>已收藏</button>
+              <button class="secondary-button" type="button" data-jump="messages">联系协商</button>
+              <button class="primary-button" type="button" data-jump="reserve">预约自提</button>
+            </div>
+          </section>
+
+          <section class="screen" data-screen="reserve">
+            <div class="card">
+              <button class="secondary-button" type="button" data-jump="detail">返回详情</button>
+            </div>
+
+            <div class="card wire-target" data-anno="3" tabindex="0">
+              <span class="pin">3</span>
+              <h3>预约自提</h3>
+              <label class="field-label">选择时间</label>
+              <div class="segmented">
+                <button class="seg-button" type="button" data-slot aria-pressed="true">今天 19:00</button>
+                <button class="seg-button" type="button" data-slot aria-pressed="false">明天 12:00</button>
+                <button class="seg-button" type="button" data-slot aria-pressed="false">周六 10:00</button>
+              </div>
+              <label class="field-label">自提范围</label>
+              <input class="field" value="小区北门公共取物点附近">
+              <label class="field-label">留言</label>
+              <textarea class="textarea">你好，我想预约这个时间，自提时可以带交换物。</textarea>
+            </div>
+
+            <div class="success hidden" data-reserve-success>
+              <strong>预约已提交</strong>
+              <p class="small">当前状态：等待发布者确认。确认后再展示更具体交接说明。</p>
+            </div>
+
+            <button class="primary-button" type="button" style="width:100%;" data-submit-reserve>提交预约</button>
+          </section>
+
+          <section class="screen" data-screen="publish">
+            <div class="card wire-target" data-anno="2" tabindex="0">
+              <span class="pin">2</span>
+              <h3>发布闲置</h3>
+              <div class="upload-grid">
+                <div class="upload-box">封面图</div>
+                <div class="upload-box">细节图</div>
+                <div class="upload-box">+ 添加</div>
+              </div>
+              <label class="field-label" for="title">标题</label>
+              <input class="field" id="title" value="儿童滑板车">
+              <label class="field-label" for="category">类目</label>
+              <select class="select" id="category">
+                <option>母婴儿童</option>
+                <option>家居日用</option>
+                <option>数码小件</option>
+              </select>
+              <label class="field-label">方式</label>
+              <div class="segmented">
+                <button class="seg-button" type="button" data-trade-mode aria-pressed="true">交换</button>
+                <button class="seg-button" type="button" data-trade-mode aria-pressed="false">低价</button>
+                <button class="seg-button" type="button" data-trade-mode aria-pressed="false">免费</button>
+              </div>
+              <label class="field-label" for="want">期望交换物 / 说明</label>
+              <input class="field" id="want" value="希望换绘本、积木或同龄玩具">
+            </div>
+
+            <div class="card wire-target" data-anno="3" tabindex="0">
+              <span class="pin">3</span>
+              <h3>自提范围与隐私</h3>
+              <input class="field" value="小区北门公共取物点附近">
+              <p class="small">发布阶段只展示模糊范围。双方确认预约后，再展示更具体交接说明。</p>
+            </div>
+
+            <div class="notice">
+              <strong>发布前提示</strong>
+              <p class="small">低价转让仅支持线下协商，不展示线上支付或担保承诺。违规内容会被下架。</p>
+            </div>
+
+            <div class="success hidden" data-publish-success>
+              <strong>已提交审核</strong>
+              <p class="small">通过后将在附近闲置中展示，并优先标明认证状态和可自提范围。</p>
+            </div>
+
+            <button class="primary-button" type="button" style="width:100%;" data-submit-publish>提交发布</button>
+          </section>
+
+          <section class="screen" data-screen="messages">
+            <div class="message-card wire-target" data-anno="4" tabindex="0">
+              <span class="pin">4</span>
+              <h3>儿童餐椅｜交换协商</h3>
+              <div class="bubble">你好，餐椅还在吗？我有一套 3-5 岁绘本可以换。</div>
+              <div class="bubble me">还在。今天 19:00 后可以在北门公共点位见面。</div>
+              <div class="bubble">可以，我先发起预约，具体位置确认后再看。</div>
+              <div class="chips">
+                <span class="tag strong">预约待确认</span>
+                <span class="tag">不展示手机号</span>
+                <span class="tag">不展示门牌号</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>快捷协商</h3>
+              <div class="chips">
+                <button class="chip" type="button" data-quick-message>询问是否还在</button>
+                <button class="chip" type="button" data-quick-message>确认自提时间</button>
+                <button class="chip" type="button" data-quick-message>说明交换物</button>
+              </div>
+            </div>
+
+            <div class="success hidden" data-message-success>
+              <strong>已插入快捷回复</strong>
+              <p class="small">快捷语只帮助表达意图，不替代双方确认预约。</p>
+            </div>
+          </section>
+
+          <section class="screen" data-screen="profile">
+            <div class="card wire-target" data-anno="5" tabindex="0">
+              <span class="pin">5</span>
+              <h3>可信身份</h3>
+              <div class="identity-row">
+                <span><strong>实名核验</strong><br><span class="small">用于降低恶意发布和爽约风险</span></span>
+                <span class="tag strong" data-real-status>已通过</span>
+              </div>
+              <div class="identity-row">
+                <span><strong>小区认证</strong><br><span class="small">证明用户属于附近社区范围</span></span>
+                <span class="tag warn" data-community-status>待认证</span>
+              </div>
+              <div class="identity-row">
+                <span><strong>完成记录</strong><br><span class="small">完成 8 次，暂无违规处理</span></span>
+                <span class="tag">可展示</span>
+              </div>
+              <button class="primary-button" type="button" data-start-verify>去认证小区</button>
+            </div>
+
+            <div class="card hidden" data-verify-form>
+              <h3>小区认证表单</h3>
+              <label class="field-label" for="community">社区 / 小区</label>
+              <input class="field" id="community" value="云溪花园">
+              <label class="field-label" for="proof">认证材料</label>
+              <input class="field" id="proof" value="物业住户码 / 社区邀请链接">
+              <p class="small">认证材料仅用于审核，不在前台展示。</p>
+              <button class="primary-button" type="button" data-submit-verify>提交认证</button>
+            </div>
+
+            <div class="success hidden" data-verify-success>
+              <strong>认证已提交</strong>
+              <p class="small">审核通过后，物品卡片和详情页可展示“小区认证”标识。</p>
+            </div>
+          </section>
+
+          <nav class="bottom-nav" aria-label="小程序底部导航">
+            <button type="button" data-jump="home" aria-pressed="true">广场</button>
+            <button type="button" data-jump="publish" aria-pressed="false">发布</button>
+            <button type="button" data-jump="messages" aria-pressed="false">消息</button>
+            <button type="button" data-jump="profile" aria-pressed="false">我的</button>
+          </nav>
+        </section>
+
+        <aside class="side-note">
+          <h2>当前屏说明</h2>
+          <p class="small" data-live-note>广场页重点验证筛选、收藏和进入协商的路径。</p>
+          <h2>本步边界</h2>
+          <p class="small">不做完整发布审核后台，不做支付，不做 Step C 的举报处理详情，只保留必要入口和风险表达。</p>
+        </aside>
+      </div>
+    </section>
+
+    <aside class="doc-panel" aria-label="右侧说明文档">
+      <h1>右侧说明文档</h1>
+      <p class="small">Step B 使用单手机容器模拟小程序页面切换，用于验证扩展交互是否能自然接上 Step A 主路径。</p>
+
+      <h2>原型说明</h2>
+      <p class="small">本次覆盖发布闲置、筛选收藏、消息协商和可信身份入口。页面跳转通过状态切换模拟，不代表最终工程路由。</p>
+
+      <h2>功能说明</h2>
+      <p class="small">广场页可切筛选和收藏；发布页可选择交易方式并提交；消息页展示协商但不泄露隐私；我的页展示实名与小区认证。</p>
+
+      <h2>字段说明</h2>
+      <p class="small">发布字段包括图片、标题、类目、方式、期望交换物、自提范围；身份字段包括实名状态、小区认证、完成记录；消息字段包括预约状态和隐私标签。</p>
+
+      <h2>交互说明</h2>
+      <p class="small">底部导航和左侧节点都可切换屏幕；提交发布、快捷回复、提交认证会触发对应成功状态；隐藏标注可检查页面本体。</p>
+
+      <h2>编号标注</h2>
+      <div class="doc-item" data-anno="1" data-pin="1" tabindex="0"><strong>筛选与收藏</strong><br>Step B 在广场页补足收藏状态和筛选反馈，支持用户后续从收藏或消息继续协商。</div>
+      <div class="doc-item" data-anno="2" data-pin="2" tabindex="0"><strong>发布闲置表单</strong><br>发布只采集能支撑展示和协商的最小字段，避免早期表单过重。</div>
+      <div class="doc-item" data-anno="3" data-pin="3" tabindex="0"><strong>自提范围隐私</strong><br>发布阶段只展示公共点位或模糊范围，具体位置在双方确认后再展示。</div>
+      <div class="doc-item" data-anno="4" data-pin="4" tabindex="0"><strong>消息协商边界</strong><br>协商发生在小程序内，不直接展示手机号、门牌号，也不替代预约确认。</div>
+      <div class="doc-item" data-anno="5" data-pin="5" tabindex="0"><strong>可信身份入口</strong><br>实名和小区认证增强信任，但前台只展示状态，不展示认证材料和真实身份细节。</div>
+
+      <h2>验收点</h2>
+      <p class="small">检查用户是否能理解发布、收藏、协商、认证如何接上主路径；检查界面是否仍然克制，没有支付担保、公开惩罚或精确住址暗示。</p>
+    </aside>
+  </main>
+
+  <script>
+    const screenTitles = {
+      home: '附近闲置',
+      detail: '物品详情',
+      reserve: '预约自提',
+      publish: '发布闲置',
+      messages: '消息协商',
+      profile: '我的'
+    };
+
+    const notes = {
+      home: '广场页重点验证筛选、收藏和进入协商的路径。',
+      detail: '详情页重点验证物品信息、发布者可信状态、联系协商和预约入口。',
+      reserve: '预约页重点验证自提时间、模糊地点和提交后等待确认状态。',
+      publish: '发布页重点验证最小发布字段、交易方式和自提隐私边界。',
+      messages: '消息页重点验证协商发生在站内，且不泄露手机号或门牌号。',
+      profile: '我的页重点验证实名、小区认证、完成记录的可信展示方式。'
+    };
+
+    const itemData = {
+      chair: {
+        title: '儿童餐椅',
+        mode: '交换',
+        distance: '600m',
+        condition: '九成新',
+        desc: '家里孩子长大后闲置，希望换一套 3-5 岁绘本。可在小区北门公共取物点自提。'
+      },
+      lamp: {
+        title: '书桌台灯',
+        mode: '低价',
+        distance: '1.2km',
+        condition: '功能正常',
+        desc: '亮度三档可调，低价转让，双方线下协商。建议在社区公共区域自提。'
+      }
+    };
+
+    function syncActive(id, on) {
+      document.querySelectorAll('[data-anno="' + id + '"]').forEach((node) => {
+        node.classList.toggle('is-active', on);
+      });
+    }
+
+    function showScreen(name) {
+      document.querySelectorAll('[data-screen]').forEach((screen) => {
+        screen.classList.toggle('active', screen.dataset.screen === name);
+      });
+      document.querySelectorAll('[data-jump]').forEach((button) => {
+        if (button.dataset.jump) {
+          button.setAttribute('aria-pressed', button.dataset.jump === name ? 'true' : 'false');
+        }
+      });
+      document.querySelector('[data-screen-title]').textContent = screenTitles[name];
+      document.querySelector('[data-live-note]').textContent = notes[name];
+    }
+
+    function openDetail(itemKey) {
+      const item = itemData[itemKey] || itemData.chair;
+      document.querySelector('[data-detail-title]').textContent = item.title;
+      document.querySelector('[data-detail-mode]').textContent = item.mode;
+      document.querySelector('[data-detail-distance]').textContent = item.distance;
+      document.querySelector('[data-detail-condition]').textContent = item.condition;
+      document.querySelector('[data-detail-desc]').textContent = item.desc;
+      showScreen('detail');
+    }
+
+    document.querySelectorAll('[data-anno]').forEach((node) => {
+      const id = node.getAttribute('data-anno');
+      node.addEventListener('mouseenter', () => syncActive(id, true));
+      node.addEventListener('mouseleave', () => syncActive(id, false));
+      node.addEventListener('focusin', () => syncActive(id, true));
+      node.addEventListener('focusout', () => syncActive(id, false));
+    });
+
+    document.querySelectorAll('[data-jump]').forEach((button) => {
+      button.addEventListener('click', () => showScreen(button.dataset.jump));
+    });
+
+    document.querySelectorAll('[data-open-detail]').forEach((button) => {
+      button.addEventListener('click', () => openDetail(button.dataset.openDetail));
+    });
+
+    document.querySelector('[data-toggle-pins]').addEventListener('click', (event) => {
+      document.body.classList.toggle('hide-pins');
+      event.currentTarget.textContent = document.body.classList.contains('hide-pins') ? '显示标注' : '隐藏标注';
+    });
+
+    document.querySelectorAll('[data-filter]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-filter]').forEach((item) => {
+          item.setAttribute('aria-pressed', item === button ? 'true' : 'false');
+        });
+      });
+    });
+
+    document.querySelectorAll('[data-trade-mode]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-trade-mode]').forEach((item) => {
+          item.setAttribute('aria-pressed', item === button ? 'true' : 'false');
+        });
+      });
+    });
+
+    document.querySelectorAll('[data-slot]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-slot]').forEach((item) => {
+          item.setAttribute('aria-pressed', item === button ? 'true' : 'false');
+        });
+      });
+    });
+
+    document.querySelector('[data-certified-chip]').addEventListener('click', (event) => {
+      event.currentTarget.classList.toggle('active');
+    });
+
+    document.querySelector('[data-toggle-favorite]').addEventListener('click', (event) => {
+      const active = event.currentTarget.textContent === '已收藏';
+      event.currentTarget.textContent = active ? '收藏' : '已收藏';
+    });
+
+    document.querySelector('[data-submit-reserve]').addEventListener('click', () => {
+      document.querySelector('[data-reserve-success]').classList.remove('hidden');
+    });
+
+    document.querySelector('[data-submit-publish]').addEventListener('click', () => {
+      document.querySelector('[data-publish-success]').classList.remove('hidden');
+    });
+
+    document.querySelectorAll('[data-quick-message]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelector('[data-message-success]').classList.remove('hidden');
+      });
+    });
+
+    document.querySelector('[data-start-verify]').addEventListener('click', () => {
+      document.querySelector('[data-verify-form]').classList.remove('hidden');
+    });
+
+    document.querySelector('[data-submit-verify]').addEventListener('click', () => {
+      document.querySelector('[data-verify-success]').classList.remove('hidden');
+      document.querySelector('[data-community-status]').className = 'tag strong';
+      document.querySelector('[data-community-status]').textContent = '审核中';
+    });
+
+    document.querySelector('[data-reset]').addEventListener('click', () => {
+      showScreen('home');
+      document.body.classList.remove('hide-pins');
+      document.querySelector('[data-toggle-pins]').textContent = '隐藏标注';
+      document.querySelector('[data-publish-success]').classList.add('hidden');
+      document.querySelector('[data-reserve-success]').classList.add('hidden');
+      document.querySelector('[data-message-success]').classList.add('hidden');
+      document.querySelector('[data-verify-form]').classList.add('hidden');
+      document.querySelector('[data-verify-success]').classList.add('hidden');
+      document.querySelector('[data-community-status]').className = 'tag warn';
+      document.querySelector('[data-community-status]').textContent = '待认证';
+      document.querySelectorAll('[data-filter]').forEach((item, index) => item.setAttribute('aria-pressed', index === 0 ? 'true' : 'false'));
+      document.querySelectorAll('[data-trade-mode]').forEach((item, index) => item.setAttribute('aria-pressed', index === 0 ? 'true' : 'false'));
+      document.querySelectorAll('[data-slot]').forEach((item, index) => item.setAttribute('aria-pressed', index === 0 ? 'true' : 'false'));
+      document.querySelector('[data-toggle-favorite]').textContent = '已收藏';
+    });
+  </script>
+</body>
+</html>

@@ -55,3 +55,21 @@
 - "按推荐继续" confirms assumptions only; it is not permission to generate HTML or write `requirements.md` unless the user explicitly says so.
 - The prototype step plan is binding: each generation should execute only the current step by default, then ask for user acceptance before continuing.
 - For every product type, design principles and risk boundaries must be confirmed before prototype generation; sensitive or emotion-heavy domains require extra care but are not the only cases.
+
+## 2026-06-26 - Step 3 Wireframe Decisions
+
+- Wireframe mode is a general-purpose capability, not a pair of hardcoded product templates.
+- Wireframes validate information structure, main path, module relationships, fields, states, and interaction logic; they do not validate final visual style.
+- Wireframe generation requires a confirmed PRD Lite, confirmed current step, known side/platform, and confirmed design principles/risk boundaries.
+- The PRD step plan remains binding in wireframe mode: generate only the current step, then wait for user acceptance before continuing.
+- V1 wireframe output must include a previewable single-file HTML, right-side documentation, numbered circular pins, annotation show/hide, two-way hover/focus highlight, and at least one meaningful interaction.
+- Numbered circular pins remain the only annotation model in V1; SVG long connector lines are not used.
+- `starter-components/wireframe-template.html` is a reusable interaction/layout skeleton, not a product design.
+- `examples/01-wireframe-demo/` demonstrates B-side and C-side structure differences, but examples are not capability boundaries and must not be copied as fixed business templates.
+- Wireframe structure must be derived from the confirmed PRD, platform, domain, information shape, and primary user action; low fidelity does not mean all products share one layout.
+- Wireframe mode should use the existing design reference routing when platform conventions matter, loading only relevant guidance instead of every reference.
+- Mobile wireframes support both multi-screen flow overview and single interactive container modes.
+- User-requested single-screen mobile wireframes must preserve confirmed current-step requirements through local interactions or an explicit user-approved step split; requirements must not disappear because of screen constraints.
+- Long prototype refinement needs an iteration guard: the Agent should periodically restate current PRD step/presentation mode/acceptance target, read current files when context is noisy, and re-check Skill baselines before delivery.
+- B-side wireframes should usually favor desktop operational structure, density, filters, tables/lists, and detail panels when the PRD calls for them.
+- C-side wireframes should usually favor mobile flow structure, primary actions, state feedback, and step cues when the PRD calls for them.

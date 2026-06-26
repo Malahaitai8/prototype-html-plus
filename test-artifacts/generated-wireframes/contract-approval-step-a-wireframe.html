@@ -1,0 +1,895 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>企业合同审批与风险跟踪后台 Step A 低保真线框</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #1f2937;
+      --muted: #667085;
+      --line: #d0d5dd;
+      --line-dark: #98a2b3;
+      --soft: #eef1f5;
+      --accent: #1d5fd0;
+      --accent-soft: #e8f0ff;
+      --warn: #9a6700;
+      --warn-soft: #fff7df;
+      --bad: #b42318;
+      --bad-soft: #fff1f0;
+      --ok: #067647;
+      --ok-soft: #ecfdf3;
+      --radius: 8px;
+      --doc-width: 380px;
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--doc-width);
+    }
+
+    .prototype {
+      padding: 18px;
+      overflow: auto;
+    }
+
+    .doc-panel {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      border-left: 1px solid var(--line);
+      background: var(--panel);
+      padding: 18px;
+    }
+
+    .app-frame {
+      min-width: 1080px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+    }
+
+    .topbar {
+      min-height: 58px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .brand h1,
+    .doc-panel h1 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .brand p,
+    .doc-panel p {
+      margin: 4px 0 0;
+      color: var(--muted);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 188px minmax(0, 1fr);
+      min-height: 760px;
+    }
+
+    .side-nav {
+      border-right: 1px solid var(--line);
+      background: #fbfcfd;
+      padding: 14px 10px;
+    }
+
+    .nav-item {
+      width: 100%;
+      min-height: 36px;
+      margin-bottom: 6px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      background: transparent;
+      text-align: left;
+      color: var(--ink);
+      padding: 7px 10px;
+    }
+
+    .nav-item.active {
+      border-color: var(--line);
+      background: var(--soft);
+      font-weight: 700;
+    }
+
+    .workbench {
+      padding: 14px;
+    }
+
+    .notice {
+      margin-bottom: 12px;
+      color: var(--muted);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .summary-card,
+    .filter-bar,
+    .table-wrap,
+    .detail-pane,
+    .doc-item,
+    .modal {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+    }
+
+    .summary-card {
+      min-height: 86px;
+      padding: 12px;
+    }
+
+    .summary-card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 22px;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(360px, .7fr);
+      gap: 12px;
+      align-items: start;
+    }
+
+    .tabs,
+    .toolbar,
+    .actions,
+    .pill-row,
+    .meta-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .tabs {
+      margin-bottom: 10px;
+    }
+
+    .tab,
+    .ghost-button,
+    .primary-button,
+    .secondary-button,
+    .danger-button,
+    .chip {
+      min-height: 32px;
+      border: 1px solid var(--line-dark);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      padding: 6px 10px;
+    }
+
+    .primary-button {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .secondary-button {
+      background: var(--soft);
+    }
+
+    .danger-button {
+      border-color: var(--bad);
+      color: var(--bad);
+    }
+
+    .tab[aria-pressed="true"],
+    .chip.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .filter-bar {
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .field {
+      min-height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 6px 9px;
+      color: var(--muted);
+    }
+
+    .table {
+      display: grid;
+      grid-template-columns: 1.4fr .8fr .8fr .8fr .8fr .9fr;
+      min-width: 760px;
+    }
+
+    .cell {
+      min-height: 48px;
+      padding: 10px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .head {
+      min-height: 40px;
+      background: var(--soft);
+      color: var(--muted);
+      font-weight: 700;
+      border-top: 0;
+    }
+
+    .contract-row {
+      display: contents;
+    }
+
+    .contract-row.selected .cell {
+      background: var(--accent-soft);
+    }
+
+    .status,
+    .risk {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 24px;
+      border-radius: 999px;
+      padding: 2px 8px;
+      border: 1px solid var(--line);
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+    .risk.high {
+      border-color: #f1a29b;
+      background: var(--bad-soft);
+      color: var(--bad);
+    }
+
+    .risk.mid,
+    .status.pending {
+      border-color: #e7c56f;
+      background: var(--warn-soft);
+      color: var(--warn);
+    }
+
+    .risk.low,
+    .status.done {
+      border-color: #8fd6ad;
+      background: var(--ok-soft);
+      color: var(--ok);
+    }
+
+    .detail-pane {
+      position: relative;
+      padding: 12px;
+      min-height: 650px;
+    }
+
+    h2,
+    h3 {
+      margin: 0 0 10px;
+      letter-spacing: 0;
+    }
+
+    h2 { font-size: 16px; }
+    h3 { font-size: 14px; }
+
+    .section {
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+      margin-top: 12px;
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr);
+      row-gap: 8px;
+      column-gap: 10px;
+      color: var(--muted);
+    }
+
+    .kv strong {
+      color: var(--ink);
+      font-weight: 400;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .step {
+      min-height: 78px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 9px;
+      background: #fff;
+    }
+
+    .step.done {
+      background: var(--ok-soft);
+      border-color: #8fd6ad;
+    }
+
+    .step.current {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .risk-list,
+    .material-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .risk-item,
+    .material-item,
+    .decision-box {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 9px;
+    }
+
+    .risk-item.high {
+      border-color: #f1a29b;
+      background: var(--bad-soft);
+    }
+
+    .decision-box {
+      background: #fbfcfd;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 66px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px;
+      resize: vertical;
+      background: #fff;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .wire-target {
+      position: relative;
+      outline: 0 solid transparent;
+      transition: background .16s ease, outline-color .16s ease;
+    }
+
+    .wire-target.is-active {
+      outline: 2px solid var(--accent);
+      background-color: var(--accent-soft);
+    }
+
+    .pin {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      background: #111827;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 1px var(--line-dark);
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      z-index: 3;
+    }
+
+    body.hide-pins .pin {
+      display: none;
+    }
+
+    .doc-panel h2 {
+      margin: 18px 0 8px;
+      font-size: 14px;
+    }
+
+    .doc-item {
+      padding: 10px 10px 10px 42px;
+      margin: 8px 0;
+      position: relative;
+    }
+
+    .doc-item::before {
+      content: attr(data-pin);
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: #111827;
+      color: #fff;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .doc-item.is-active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(15, 23, 42, .28);
+      z-index: 10;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(520px, 100%);
+      padding: 16px;
+    }
+
+    .modal .actions {
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      display: none;
+      min-width: 260px;
+      border: 1px solid var(--line-dark);
+      border-radius: 6px;
+      background: #fff;
+      padding: 10px 14px;
+      z-index: 11;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    @media (max-width: 920px) {
+      .shell {
+        display: block;
+      }
+
+      .prototype {
+        padding: 10px;
+      }
+
+      .doc-panel {
+        position: static;
+        height: auto;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .app-frame {
+        min-width: 0;
+      }
+
+      .layout,
+      .main-grid,
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .side-nav {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="prototype" aria-label="企业合同审批与风险跟踪后台线框">
+      <div class="app-frame">
+        <header class="topbar">
+          <div class="brand">
+            <h1>企业合同审批与风险跟踪后台</h1>
+            <p>Step A 低保真线框：合同列表、详情、审批进度、风险条款、驳回与补充材料。</p>
+          </div>
+          <div class="toolbar">
+            <button type="button" class="ghost-button" data-toggle-pins>隐藏标注</button>
+            <button type="button" class="secondary-button">当前身份：业务负责人</button>
+          </div>
+        </header>
+
+        <div class="layout">
+          <aside class="side-nav" aria-label="后台导航">
+            <button type="button" class="nav-item active">合同审批</button>
+            <button type="button" class="nav-item">风险条款</button>
+            <button type="button" class="nav-item">到期提醒</button>
+            <button type="button" class="nav-item">材料中心</button>
+            <button type="button" class="nav-item">操作日志</button>
+          </aside>
+
+          <section class="workbench">
+            <p class="notice">低保真线框只用于验证结构、主路径和交互逻辑，示例数据不是固定产品模板。</p>
+
+            <div class="summary-grid">
+              <article class="summary-card">
+                <span class="small">待我处理</span>
+                <strong>8</strong>
+                <span class="small">含 3 份高风险合同</span>
+              </article>
+              <article class="summary-card">
+                <span class="small">审批中</span>
+                <strong>26</strong>
+                <span class="small">平均停留 1.8 天</span>
+              </article>
+              <article class="summary-card">
+                <span class="small">高风险条款</span>
+                <strong>12</strong>
+                <span class="small">均由法务人工标记</span>
+              </article>
+              <article class="summary-card">
+                <span class="small">30 天内到期</span>
+                <strong>5</strong>
+                <span class="small">建议优先续签确认</span>
+              </article>
+            </div>
+
+            <div class="main-grid">
+              <section>
+                <div class="tabs wire-target" data-anno="1">
+                  <span class="pin">1</span>
+                  <button type="button" class="tab" data-scope="mine" aria-pressed="true">待我处理</button>
+                  <button type="button" class="tab" data-scope="all" aria-pressed="false">全部合同</button>
+                </div>
+
+                <div class="filter-bar">
+                  <div class="toolbar">
+                    <span class="field">合同名称 / 编号 / 相对方</span>
+                    <span class="field">状态：全部</span>
+                    <span class="field">风险等级：全部</span>
+                    <span class="field">到期区间：未来 30 天</span>
+                    <button type="button" class="secondary-button" data-filter>筛选</button>
+                  </div>
+                </div>
+
+                <div class="table-wrap wire-target" data-anno="2">
+                  <span class="pin">2</span>
+                  <div class="table" role="table" aria-label="合同列表">
+                    <div class="cell head">合同</div>
+                    <div class="cell head">状态</div>
+                    <div class="cell head">风险</div>
+                    <div class="cell head">当前节点</div>
+                    <div class="cell head">到期</div>
+                    <div class="cell head">操作</div>
+
+                    <div class="contract-row selected" data-row="supply">
+                      <div class="cell"><strong>年度设备采购框架合同</strong><span class="small">HT-2026-0418</span></div>
+                      <div class="cell"><span class="status pending">待我审批</span></div>
+                      <div class="cell"><span class="risk high">高风险</span></div>
+                      <div class="cell">业务负责人审批</div>
+                      <div class="cell">2026-07-20</div>
+                      <div class="cell"><button type="button" class="ghost-button" data-select="supply">查看</button></div>
+                    </div>
+
+                    <div class="contract-row" data-row="service">
+                      <div class="cell"><strong>售后服务外包协议</strong><span class="small">HT-2026-0399</span></div>
+                      <div class="cell"><span class="status pending">待补充材料</span></div>
+                      <div class="cell"><span class="risk mid">中风险</span></div>
+                      <div class="cell">采购补充材料</div>
+                      <div class="cell">2026-08-05</div>
+                      <div class="cell"><button type="button" class="ghost-button" data-select="service">查看</button></div>
+                    </div>
+
+                    <div class="contract-row" data-row="license">
+                      <div class="cell"><strong>软件授权续签合同</strong><span class="small">HT-2026-0371</span></div>
+                      <div class="cell"><span class="status done">法务已审</span></div>
+                      <div class="cell"><span class="risk low">低风险</span></div>
+                      <div class="cell">采购审核</div>
+                      <div class="cell">2026-07-08</div>
+                      <div class="cell"><button type="button" class="ghost-button" data-select="license">查看</button></div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <aside class="detail-pane" aria-label="合同详情">
+                <section class="wire-target" data-anno="3">
+                  <span class="pin">3</span>
+                  <h2 data-detail-title>年度设备采购框架合同</h2>
+                  <div class="kv">
+                    <span>合同编号</span><strong data-detail-code>HT-2026-0418</strong>
+                    <span>相对方</span><strong data-detail-party>华东工业设备有限公司</strong>
+                    <span>金额</span><strong data-detail-amount>¥ 3,280,000</strong>
+                    <span>当前节点</span><strong data-detail-node>业务负责人审批</strong>
+                  </div>
+                </section>
+
+                <section class="section">
+                  <h3>审批进度</h3>
+                  <div class="steps">
+                    <div class="step done"><strong>业务提交</strong><br><span class="small">已提交<br>06-20 10:12</span></div>
+                    <div class="step done"><strong>采购审核</strong><br><span class="small">已通过<br>06-21 15:30</span></div>
+                    <div class="step done"><strong>法务审核</strong><br><span class="small">标记 2 项风险<br>06-22 18:05</span></div>
+                    <div class="step current"><strong>负责人审批</strong><br><span class="small">等待处理<br>当前节点</span></div>
+                  </div>
+                </section>
+
+                <section class="section wire-target" data-anno="4">
+                  <span class="pin">4</span>
+                  <h3>风险条款</h3>
+                  <div class="risk-list" data-risk-list>
+                    <div class="risk-item high">
+                      <div class="pill-row"><span class="risk high">高风险</span><strong>违约责任上限缺失</strong></div>
+                      <p class="small">法务人工标记：第 12.3 条未约定责任上限，建议补充赔偿边界。</p>
+                    </div>
+                    <div class="risk-item">
+                      <div class="pill-row"><span class="risk mid">中风险</span><strong>验收周期表述不清</strong></div>
+                      <p class="small">法务人工标记：第 6.1 条建议明确验收起算日和逾期处理方式。</p>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="section wire-target" data-anno="5">
+                  <span class="pin">5</span>
+                  <h3>审批处理</h3>
+                  <div class="decision-box">
+                    <textarea data-opinion placeholder="填写审批意见、驳回原因或补充材料说明"></textarea>
+                    <div class="actions">
+                      <button type="button" class="primary-button" data-action="approve">通过</button>
+                      <button type="button" class="danger-button" data-open-modal="reject">驳回</button>
+                      <button type="button" class="secondary-button" data-open-modal="material">要求补充材料</button>
+                    </div>
+                    <p class="small" data-decision-note>驳回和补充材料需要填写原因，便于采购或业务重新提交。</p>
+                  </div>
+                </section>
+              </aside>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <aside class="doc-panel" aria-label="原型说明文档">
+      <h1>右侧说明文档</h1>
+      <p>本页是 Step A 低保真线框，用于确认合同审批主路径，不表达最终视觉风格。</p>
+
+      <h2>原型说明</h2>
+      <p class="small">覆盖“合同列表 -> 查看详情 -> 审批进度 -> 风险条款 -> 通过 / 驳回 / 要求补充材料”的主流程。</p>
+
+      <h2>功能说明</h2>
+      <p class="small">列表用于快速扫描待办、风险和当前节点；详情用于集中处理审批、风险条款和材料问题。</p>
+
+      <h2>字段说明</h2>
+      <p class="small">核心字段包括合同编号、相对方、金额、审批状态、当前节点、风险等级和到期日期。风险条款均为法务人工标记。</p>
+
+      <h2>交互说明</h2>
+      <p class="small">可切换“待我处理 / 全部合同”，选择不同行查看详情，执行通过、驳回和补充材料动作，并查看操作反馈。</p>
+
+      <h2>编号标注</h2>
+      <div class="doc-item" data-anno="1" data-pin="1"><strong>任务范围切换</strong><br>先只区分“待我处理”和“全部合同”，避免 Step A 过早展开复杂角色权限。</div>
+      <div class="doc-item" data-anno="2" data-pin="2"><strong>合同列表状态列</strong><br>用表格聚合合同状态、风险等级、当前节点和到期时间，适合高频办公扫描。</div>
+      <div class="doc-item" data-anno="3" data-pin="3"><strong>合同详情摘要</strong><br>用户进入详情后先看到编号、相对方、金额和当前节点，快速判断是否可审批。</div>
+      <div class="doc-item" data-anno="4" data-pin="4"><strong>法务人工风险</strong><br>风险条款明确标注为法务人工识别，不暗示自动法律结论。</div>
+      <div class="doc-item" data-anno="5" data-pin="5"><strong>驳回与补充材料</strong><br>审批区支持通过、驳回和要求补充材料，后两者要求填写原因或材料项。</div>
+
+      <h2>验收点</h2>
+      <p class="small">能否看清合同状态、风险等级、当前审批节点；能否进入详情查看风险条款；能否表达通过、驳回、补充材料主流程。</p>
+    </aside>
+  </main>
+
+  <div class="modal-backdrop" data-modal="reject" role="dialog" aria-modal="true" aria-label="驳回合同">
+    <div class="modal">
+      <h2>驳回合同</h2>
+      <p class="small">请填写驳回原因，采购或业务将据此修改后重新提交。</p>
+      <textarea data-reject-text placeholder="例如：请补充违约责任上限，并修改验收周期表述。"></textarea>
+      <div class="actions">
+        <button type="button" class="ghost-button" data-close-modal>取消</button>
+        <button type="button" class="danger-button" data-confirm="reject">确认驳回</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" data-modal="material" role="dialog" aria-modal="true" aria-label="要求补充材料">
+    <div class="modal">
+      <h2>要求补充材料</h2>
+      <p class="small">请选择或填写缺失材料，系统会把合同状态更新为待补充材料。</p>
+      <div class="material-list">
+        <label class="material-item"><input type="checkbox" checked> 供应商授权书</label>
+        <label class="material-item"><input type="checkbox"> 最新报价单</label>
+        <label class="material-item"><input type="checkbox" checked> 风险条款修改说明</label>
+      </div>
+      <textarea data-material-text placeholder="补充说明"></textarea>
+      <div class="actions">
+        <button type="button" class="ghost-button" data-close-modal>取消</button>
+        <button type="button" class="secondary-button" data-confirm="material">发送补充要求</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" data-toast>操作已记录</div>
+
+  <script>
+    const contracts = {
+      supply: {
+        title: '年度设备采购框架合同',
+        code: 'HT-2026-0418',
+        party: '华东工业设备有限公司',
+        amount: '¥ 3,280,000',
+        node: '业务负责人审批',
+        risks: [
+          ['高风险', '违约责任上限缺失', '法务人工标记：第 12.3 条未约定责任上限，建议补充赔偿边界。', 'high'],
+          ['中风险', '验收周期表述不清', '法务人工标记：第 6.1 条建议明确验收起算日和逾期处理方式。', 'mid']
+        ]
+      },
+      service: {
+        title: '售后服务外包协议',
+        code: 'HT-2026-0399',
+        party: '北辰服务管理有限公司',
+        amount: '¥ 860,000',
+        node: '采购补充材料',
+        risks: [
+          ['中风险', '服务响应时限不完整', '法务人工标记：建议补充重大故障响应时限。', 'mid']
+        ]
+      },
+      license: {
+        title: '软件授权续签合同',
+        code: 'HT-2026-0371',
+        party: '云启软件科技有限公司',
+        amount: '¥ 420,000',
+        node: '采购审核',
+        risks: [
+          ['低风险', '续约通知期需确认', '法务人工标记：建议确认续约通知期限是否与采购周期匹配。', 'low']
+        ]
+      }
+    };
+
+    const syncActive = (id, on) => {
+      document.querySelectorAll(`[data-anno="${id}"]`).forEach((node) => {
+        node.classList.toggle('is-active', on);
+      });
+    };
+
+    document.querySelectorAll('[data-anno]').forEach((node) => {
+      const id = node.getAttribute('data-anno');
+      node.addEventListener('mouseenter', () => syncActive(id, true));
+      node.addEventListener('mouseleave', () => syncActive(id, false));
+      node.addEventListener('focusin', () => syncActive(id, true));
+      node.addEventListener('focusout', () => syncActive(id, false));
+    });
+
+    document.querySelector('[data-toggle-pins]').addEventListener('click', (event) => {
+      document.body.classList.toggle('hide-pins');
+      event.currentTarget.textContent = document.body.classList.contains('hide-pins') ? '显示标注' : '隐藏标注';
+    });
+
+    document.querySelectorAll('[data-scope]').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('[data-scope]').forEach((item) => {
+          item.setAttribute('aria-pressed', item === tab ? 'true' : 'false');
+        });
+        showToast(tab.dataset.scope === 'mine' ? '已切换到待我处理' : '已切换到全部合同');
+      });
+    });
+
+    document.querySelectorAll('[data-select]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const id = button.dataset.select;
+        const data = contracts[id];
+        document.querySelectorAll('.contract-row').forEach((row) => {
+          row.classList.toggle('selected', row.dataset.row === id);
+        });
+        document.querySelector('[data-detail-title]').textContent = data.title;
+        document.querySelector('[data-detail-code]').textContent = data.code;
+        document.querySelector('[data-detail-party]').textContent = data.party;
+        document.querySelector('[data-detail-amount]').textContent = data.amount;
+        document.querySelector('[data-detail-node]').textContent = data.node;
+        document.querySelector('[data-risk-list]').innerHTML = data.risks.map((risk) => `
+          <div class="risk-item ${risk[3] === 'high' ? 'high' : ''}">
+            <div class="pill-row"><span class="risk ${risk[3]}">${risk[0]}</span><strong>${risk[1]}</strong></div>
+            <p class="small">${risk[2]}</p>
+          </div>
+        `).join('');
+      });
+    });
+
+    document.querySelector('[data-filter]').addEventListener('click', () => {
+      showToast('筛选条件已应用：当前为线框示意');
+    });
+
+    document.querySelector('[data-action="approve"]').addEventListener('click', () => {
+      showToast('审批通过，合同进入待签署');
+    });
+
+    document.querySelectorAll('[data-open-modal]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelector(`[data-modal="${button.dataset.openModal}"]`).classList.add('open');
+      });
+    });
+
+    document.querySelectorAll('[data-close-modal]').forEach((button) => {
+      button.addEventListener('click', closeModals);
+    });
+
+    document.querySelectorAll('[data-confirm]').forEach((button) => {
+      button.addEventListener('click', () => {
+        closeModals();
+        showToast(button.dataset.confirm === 'reject' ? '已驳回，等待重新提交' : '已发送补充材料要求');
+      });
+    });
+
+    function closeModals() {
+      document.querySelectorAll('.modal-backdrop').forEach((modal) => modal.classList.remove('open'));
+    }
+
+    function showToast(message) {
+      const toast = document.querySelector('[data-toast]');
+      toast.textContent = message;
+      toast.classList.add('show');
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+  </script>
+</body>
+</html>

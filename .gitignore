@@ -15,6 +15,7 @@ playwright-report/
 test-results/
 screenshots/
 renders/
+/*-wireframe.html
 *.log
 
 # Dependencies and caches

@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>社区闲置交换小程序 Step A 低保真线框</title>
+  <style>
+    :root {
+      --bg: #f5f6f8;
+      --panel: #ffffff;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #d4d8de;
+      --line-dark: #8f98a3;
+      --soft: #eef1f4;
+      --accent: #2563eb;
+      --accent-soft: #e8f0ff;
+      --warn-soft: #fff7e6;
+      --warn-line: #d99a20;
+      --radius: 8px;
+      --doc-width: 380px;
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--doc-width);
+    }
+
+    .prototype {
+      padding: 20px;
+      overflow: auto;
+    }
+
+    .doc-panel {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      border-left: 1px solid var(--line);
+      background: var(--panel);
+      padding: 18px;
+    }
+
+    .topbar,
+    .stage,
+    .phone,
+    .doc-item {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: var(--radius);
+    }
+
+    .topbar {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin-bottom: 4px;
+      font-size: 18px;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    p {
+      margin-bottom: 8px;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .toolbar,
+    .tabs,
+    .chips,
+    .actions,
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .ghost-button,
+    .tab,
+    .chip,
+    .primary-button,
+    .secondary-button {
+      min-height: 32px;
+      border: 1px solid var(--line-dark);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      padding: 6px 10px;
+    }
+
+    .primary-button {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .secondary-button {
+      background: var(--soft);
+    }
+
+    .tab[aria-pressed="true"],
+    .chip.active,
+    .slot.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .stage {
+      padding: 16px;
+    }
+
+    .flow-note {
+      max-width: 920px;
+      margin-bottom: 16px;
+      color: var(--muted);
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(260px, 1fr));
+      gap: 14px;
+      align-items: start;
+    }
+
+    .phone {
+      position: relative;
+      min-height: 700px;
+      padding: 12px;
+      background: #fbfbfc;
+    }
+
+    .phone-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 44px;
+      border-bottom: 1px solid var(--line);
+      margin: -12px -12px 12px;
+      padding: 8px 12px;
+      background: #fff;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .screen-title {
+      font-weight: 700;
+    }
+
+    .search {
+      width: 100%;
+      min-height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 8px 10px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .filter-block,
+    .item-card,
+    .detail-block,
+    .notice,
+    .reservation-card,
+    .status-block {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .item-card {
+      display: grid;
+      grid-template-columns: 64px minmax(0, 1fr);
+      gap: 10px;
+      text-align: left;
+      width: 100%;
+    }
+
+    .item-card.selected {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .thumb {
+      width: 64px;
+      height: 64px;
+      border: 1px dashed var(--line-dark);
+      border-radius: 4px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      background: var(--soft);
+      font-size: 12px;
+    }
+
+    .item-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-weight: 700;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 7px;
+      color: var(--muted);
+      background: #fff;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .tag.strong {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .placeholder-media {
+      height: 150px;
+      border: 1px dashed var(--line-dark);
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      background: repeating-linear-gradient(
+        -45deg,
+        #fff,
+        #fff 8px,
+        var(--soft) 8px,
+        var(--soft) 16px
+      );
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .field {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px 10px;
+      background: #fff;
+      color: var(--muted);
+      width: 100%;
+      resize: vertical;
+    }
+
+    .slot-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .slot {
+      border: 1px solid var(--line-dark);
+      border-radius: 6px;
+      background: #fff;
+      min-height: 42px;
+      padding: 6px;
+      text-align: center;
+    }
+
+    .notice {
+      background: var(--warn-soft);
+      border-color: var(--warn-line);
+    }
+
+    .bottom-bar {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      border-top: 1px solid var(--line);
+      background: #fbfbfc;
+      padding-top: 10px;
+    }
+
+    .wide {
+      grid-column: 1 / -1;
+    }
+
+    .steps {
+      display: grid;
+      gap: 8px;
+      margin: 8px 0 12px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 24px minmax(0, 1fr);
+      gap: 8px;
+      align-items: start;
+    }
+
+    .dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line-dark);
+      background: #fff;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .step.active .dot {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .wire-target {
+      position: relative;
+      outline: 0 solid transparent;
+      transition: background .16s ease, outline-color .16s ease;
+    }
+
+    .wire-target.is-active {
+      outline: 2px solid var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .pin {
+      position: absolute;
+      top: -9px;
+      right: -9px;
+      z-index: 3;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      background: #111827;
+      color: #fff;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 1px var(--line-dark);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    body.hide-pins .pin {
+      display: none;
+    }
+
+    .doc-panel h1 {
+      margin-bottom: 4px;
+    }
+
+    .doc-panel h2 {
+      margin: 18px 0 8px;
+      font-size: 14px;
+    }
+
+    .doc-item {
+      position: relative;
+      margin: 8px 0;
+      padding: 10px 10px 10px 42px;
+    }
+
+    .doc-item::before {
+      content: attr(data-pin);
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: #111827;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .doc-item.is-active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 1180px) {
+      .flow {
+        grid-template-columns: 1fr;
+      }
+      .phone {
+        min-height: 620px;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .shell {
+        display: block;
+      }
+      .prototype {
+        padding: 12px;
+      }
+      .doc-panel {
+        position: static;
+        height: auto;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="prototype" aria-label="Step A 低保真线框">
+      <div class="topbar">
+        <div>
+          <h1>社区闲置交换小程序｜Step A 主路径低保真</h1>
+          <p class="small">线框用于验证结构、路径和交互，不代表最终视觉。当前只覆盖“浏览 -> 详情 -> 预约自提”。</p>
+        </div>
+        <div class="toolbar">
+          <button class="ghost-button" type="button" data-toggle-pins>隐藏标注</button>
+          <button class="ghost-button" type="button" data-reset>重置状态</button>
+        </div>
+      </div>
+
+      <div class="stage">
+        <p class="flow-note">用户从附近闲置列表进入详情，判断发布者是否可信，再选择自提时间并提交预约。低价转让在本版本只做线下协商，不出现支付或担保承诺。</p>
+        <div class="flow">
+          <section class="phone" aria-label="闲置广场线框">
+            <div class="phone-header">
+              <span class="screen-title">附近闲置</span>
+              <span class="small">微信小程序</span>
+            </div>
+
+            <div class="search">搜索物品、类目或小区关键词</div>
+
+            <div class="filter-block wire-target" data-anno="1" tabindex="0">
+              <span class="pin">1</span>
+              <div class="tabs" aria-label="交易方式筛选">
+                <button class="tab" type="button" data-filter="all" aria-pressed="true">推荐</button>
+                <button class="tab" type="button" data-filter="free" aria-pressed="false">免费</button>
+                <button class="tab" type="button" data-filter="swap" aria-pressed="false">交换</button>
+                <button class="tab" type="button" data-filter="low" aria-pressed="false">低价</button>
+              </div>
+              <div class="chips" style="margin-top:8px;">
+                <span class="chip active">3km 内</span>
+                <span class="chip">只看认证邻居</span>
+                <span class="chip">可今天自提</span>
+              </div>
+            </div>
+
+            <div class="wire-target" data-anno="2" tabindex="0">
+              <span class="pin">2</span>
+              <button class="item-card selected" type="button" data-item="chair">
+                <span class="thumb">图片</span>
+                <span>
+                  <span class="item-title"><span>儿童餐椅</span><span class="tag strong">交换</span></span>
+                  <span class="small">九成新｜600m｜希望换绘本</span><br>
+                  <span class="tag">实名</span> <span class="tag">小区认证</span> <span class="tag">已完成 8 次</span>
+                </span>
+              </button>
+              <button class="item-card" type="button" data-item="lamp">
+                <span class="thumb">图片</span>
+                <span>
+                  <span class="item-title"><span>书桌台灯</span><span class="tag">低价</span></span>
+                  <span class="small">功能正常｜1.2km｜线下协商</span><br>
+                  <span class="tag">实名</span> <span class="tag">待小区认证</span>
+                </span>
+              </button>
+              <button class="item-card" type="button" data-item="books">
+                <span class="thumb">图片</span>
+                <span>
+                  <span class="item-title"><span>低幼绘本一套</span><span class="tag">免费</span></span>
+                  <span class="small">轻微折痕｜300m｜周末自提</span><br>
+                  <span class="tag">实名</span> <span class="tag">小区认证</span>
+                </span>
+              </button>
+            </div>
+          </section>
+
+          <section class="phone" aria-label="物品详情线框">
+            <div class="phone-header">
+              <span class="screen-title">物品详情</span>
+              <span class="small" data-selected-distance>600m</span>
+            </div>
+
+            <div class="placeholder-media" data-selected-image>物品图片占位</div>
+
+            <div class="detail-block">
+              <h2 data-selected-title>儿童餐椅</h2>
+              <div class="meta-row">
+                <span class="tag strong" data-selected-mode>交换</span>
+                <span class="tag" data-selected-condition>九成新</span>
+                <span class="tag" data-selected-area>邻近社区</span>
+              </div>
+              <p class="small" style="margin-top:8px;" data-selected-desc>家里孩子长大后闲置，希望换一套 3-5 岁绘本。可在小区北门公共取物点自提。</p>
+            </div>
+
+            <div class="detail-block wire-target" data-anno="3" tabindex="0">
+              <span class="pin">3</span>
+              <h3>发布者可信信息</h3>
+              <div class="meta-row">
+                <span class="tag strong">实名已核验</span>
+                <span class="tag strong">小区认证</span>
+                <span class="tag">完成 8 次</span>
+              </div>
+              <p class="small">仅展示必要可信信息，不展示真实姓名、手机号或门牌号。</p>
+            </div>
+
+            <div class="notice">
+              <strong>线下自提提醒</strong>
+              <p class="small">优先选择公共区域交接。低价转让由双方线下协商，本原型不提供支付或资金担保。</p>
+            </div>
+
+            <div class="bottom-bar">
+              <button class="secondary-button" type="button">收藏</button>
+              <button class="secondary-button wire-target" type="button" data-anno="5" tabindex="0">
+                <span class="pin">5</span>
+                举报
+              </button>
+              <button class="primary-button wide" type="button" data-start-reserve>发起预约自提</button>
+            </div>
+          </section>
+
+          <section class="phone" aria-label="预约自提线框">
+            <div class="phone-header">
+              <span class="screen-title">预约自提</span>
+              <span class="small" data-reserve-state>待提交</span>
+            </div>
+
+            <div class="steps">
+              <div class="step active" data-step="1">
+                <span class="dot">1</span>
+                <span><strong>选择时间</strong><br><span class="small">向发布者提交可自提时间段</span></span>
+              </div>
+              <div class="step" data-step="2">
+                <span class="dot">2</span>
+                <span><strong>等待确认</strong><br><span class="small">发布者确认后展示更具体交接说明</span></span>
+              </div>
+              <div class="step" data-step="3">
+                <span class="dot">3</span>
+                <span><strong>线下完成</strong><br><span class="small">双方确认完成，评价与记录进入可信信息</span></span>
+              </div>
+            </div>
+
+            <div class="reservation-card wire-target" data-anno="4" tabindex="0">
+              <span class="pin">4</span>
+              <h3>可选自提时间</h3>
+              <div class="slot-grid">
+                <button class="slot active" type="button" data-slot>今天 19:00-20:00</button>
+                <button class="slot" type="button" data-slot>明天 12:00-13:00</button>
+                <button class="slot" type="button" data-slot>周六 10:00-11:00</button>
+                <button class="slot" type="button" data-slot>另约时间</button>
+              </div>
+            </div>
+
+            <div class="reservation-card">
+              <h3>自提范围</h3>
+              <div class="field">小区北门公共取物点附近，确认后再展示具体说明</div>
+            </div>
+
+            <div class="reservation-card">
+              <h3>留言</h3>
+              <textarea class="field" rows="3">你好，我想预约今天晚上的时间，自提时可带绘本交换。</textarea>
+            </div>
+
+            <div class="status-block hidden" data-success>
+              <strong>预约已提交</strong>
+              <p class="small">当前状态：等待发布者确认。若无法按时到达，请提前取消，避免影响可信记录。</p>
+            </div>
+
+            <div class="bottom-bar">
+              <button class="secondary-button" type="button">取消</button>
+              <button class="primary-button" type="button" data-submit-reserve>提交预约</button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <aside class="doc-panel" aria-label="右侧说明文档">
+      <h1>右侧说明文档</h1>
+      <p class="small">本页为 Step A 低保真线框，用于产品和前端对齐主路径结构。示例数据不是固定业务模板。</p>
+
+      <h2>原型说明</h2>
+      <p class="small">本次只验证“浏览附近闲置 -> 查看物品详情 -> 发起预约自提”。不展开发布、支付、完整纠纷、后台审核等后续步骤。</p>
+
+      <h2>功能说明</h2>
+      <p class="small">闲置广场支持交易方式筛选和认证提示；详情页展示物品、发布者可信信息与线下风险提示；预约页完成时间选择、隐私范围确认和提交状态反馈。</p>
+
+      <h2>字段说明</h2>
+      <p class="small">核心字段包括物品标题、交易方式、新旧程度、距离、社区范围、认证状态、完成次数、预约时间、自提范围和留言。</p>
+
+      <h2>交互说明</h2>
+      <p class="small">点击交易方式 Tab 会切换筛选状态；点击物品卡片会更新详情内容；点击预约按钮会聚焦预约屏；提交预约后显示“等待确认”状态。</p>
+
+      <h2>编号标注</h2>
+      <div class="doc-item" data-anno="1" data-pin="1" tabindex="0"><strong>附近范围与筛选</strong><br>用推荐、免费、交换、低价组织信息，避免一开始让用户进入复杂搜索。</div>
+      <div class="doc-item" data-anno="2" data-pin="2" tabindex="0"><strong>物品卡片可信线索</strong><br>卡片必须同时承载交易方式、距离、认证与完成记录，帮助用户快速判断是否继续查看。</div>
+      <div class="doc-item" data-anno="3" data-pin="3" tabindex="0"><strong>发布者可信身份</strong><br>展示实名和小区认证，但不暴露真实姓名、手机号、门牌号等隐私信息。</div>
+      <div class="doc-item" data-anno="4" data-pin="4" tabindex="0"><strong>预约自提与隐私提示</strong><br>先选择时间和公共取物范围，具体交接说明应在双方确认后再展示。</div>
+      <div class="doc-item" data-anno="5" data-pin="5" tabindex="0"><strong>举报与平台边界</strong><br>保留举报入口，但平台边界是处理违规、封禁和下架，不承诺资金担保或完整交易裁决。</div>
+
+      <h2>验收点</h2>
+      <p class="small">检查用户是否能看懂邻里闲置交换定位，是否能顺利走完预约自提主路径，且页面没有暗示线上支付、资金担保或公开惩罚机制。</p>
+    </aside>
+  </main>
+
+  <script>
+    const items = {
+      chair: {
+        title: '儿童餐椅',
+        mode: '交换',
+        condition: '九成新',
+        distance: '600m',
+        area: '邻近社区',
+        desc: '家里孩子长大后闲置，希望换一套 3-5 岁绘本。可在小区北门公共取物点自提。'
+      },
+      lamp: {
+        title: '书桌台灯',
+        mode: '低价',
+        condition: '功能正常',
+        distance: '1.2km',
+        area: '附近社区',
+        desc: '亮度三档可调，低价转让，双方线下协商。建议在社区公共区域自提。'
+      },
+      books: {
+        title: '低幼绘本一套',
+        mode: '免费',
+        condition: '轻微折痕',
+        distance: '300m',
+        area: '同片区',
+        desc: '适合 2-4 岁阅读，部分页面有折痕。周末可在门口公共点位自提。'
+      }
+    };
+
+    function syncActive(id, on) {
+      document.querySelectorAll('[data-anno="' + id + '"]').forEach((node) => {
+        node.classList.toggle('is-active', on);
+      });
+    }
+
+    document.querySelectorAll('[data-anno]').forEach((node) => {
+      const id = node.getAttribute('data-anno');
+      node.addEventListener('mouseenter', () => syncActive(id, true));
+      node.addEventListener('mouseleave', () => syncActive(id, false));
+      node.addEventListener('focusin', () => syncActive(id, true));
+      node.addEventListener('focusout', () => syncActive(id, false));
+    });
+
+    document.querySelector('[data-toggle-pins]').addEventListener('click', (event) => {
+      document.body.classList.toggle('hide-pins');
+      event.currentTarget.textContent = document.body.classList.contains('hide-pins') ? '显示标注' : '隐藏标注';
+    });
+
+    document.querySelectorAll('[data-filter]').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('[data-filter]').forEach((item) => {
+          const active = item === tab;
+          item.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+      });
+    });
+
+    document.querySelectorAll('[data-item]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-item]').forEach((item) => item.classList.remove('selected'));
+        button.classList.add('selected');
+        const data = items[button.dataset.item];
+        document.querySelector('[data-selected-title]').textContent = data.title;
+        document.querySelector('[data-selected-mode]').textContent = data.mode;
+        document.querySelector('[data-selected-condition]').textContent = data.condition;
+        document.querySelector('[data-selected-distance]').textContent = data.distance;
+        document.querySelector('[data-selected-area]').textContent = data.area;
+        document.querySelector('[data-selected-desc]').textContent = data.desc;
+      });
+    });
+
+    document.querySelectorAll('[data-slot]').forEach((slot) => {
+      slot.addEventListener('click', () => {
+        document.querySelectorAll('[data-slot]').forEach((item) => item.classList.remove('active'));
+        slot.classList.add('active');
+      });
+    });
+
+    document.querySelector('[data-start-reserve]').addEventListener('click', () => {
+      document.querySelector('[aria-label="预约自提线框"]').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    document.querySelector('[data-submit-reserve]').addEventListener('click', () => {
+      document.querySelector('[data-success]').classList.remove('hidden');
+      document.querySelector('[data-reserve-state]').textContent = '等待确认';
+      document.querySelector('[data-step="1"]').classList.remove('active');
+      document.querySelector('[data-step="2"]').classList.add('active');
+    });
+
+    document.querySelector('[data-reset]').addEventListener('click', () => {
+      document.querySelector('[data-success]').classList.add('hidden');
+      document.querySelector('[data-reserve-state]').textContent = '待提交';
+      document.querySelector('[data-step="1"]').classList.add('active');
+      document.querySelector('[data-step="2"]').classList.remove('active');
+      document.querySelectorAll('[data-slot]').forEach((item, index) => item.classList.toggle('active', index === 0));
+      document.querySelector('[data-item="chair"]').click();
+    });
+  </script>
+</body>
+</html>

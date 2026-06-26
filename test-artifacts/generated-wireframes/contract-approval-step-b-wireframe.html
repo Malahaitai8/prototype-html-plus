@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>企业合同审批与风险跟踪后台 Step B 扩展交互线框</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #1f2937;
+      --muted: #667085;
+      --line: #d0d5dd;
+      --line-dark: #98a2b3;
+      --soft: #eef1f5;
+      --accent: #1d5fd0;
+      --accent-soft: #e8f0ff;
+      --warn: #9a6700;
+      --warn-soft: #fff7df;
+      --bad: #b42318;
+      --bad-soft: #fff1f0;
+      --ok: #067647;
+      --ok-soft: #ecfdf3;
+      --radius: 8px;
+      --doc-width: 380px;
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--bg); font-size: 14px; line-height: 1.45; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .shell { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1fr) var(--doc-width); }
+    .prototype { padding: 18px; overflow: auto; }
+    .doc-panel { position: sticky; top: 0; height: 100vh; overflow: auto; border-left: 1px solid var(--line); background: var(--panel); padding: 18px; }
+    .app-frame { min-width: 1120px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); }
+    .topbar { min-height: 58px; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: #fff; border-radius: var(--radius) var(--radius) 0 0; }
+    .brand h1, .doc-panel h1 { margin: 0; font-size: 18px; letter-spacing: 0; }
+    .brand p, .doc-panel p { margin: 4px 0 0; color: var(--muted); }
+    h2, h3, p { margin-top: 0; letter-spacing: 0; }
+    h2 { margin-bottom: 10px; font-size: 16px; }
+    h3 { margin-bottom: 8px; font-size: 14px; }
+
+    .layout { display: grid; grid-template-columns: 188px minmax(0, 1fr); min-height: 800px; }
+    .side-nav { border-right: 1px solid var(--line); background: #fbfcfd; padding: 14px 10px; }
+    .nav-item { width: 100%; min-height: 36px; margin-bottom: 6px; border: 1px solid transparent; border-radius: 6px; background: transparent; text-align: left; color: var(--ink); padding: 7px 10px; }
+    .nav-item.active { border-color: var(--line); background: var(--soft); font-weight: 700; }
+    .workbench { padding: 14px; }
+    .notice { margin-bottom: 12px; color: var(--muted); }
+
+    .toolbar, .tabs, .actions, .pill-row, .meta-line, .filter-grid, .summary-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .tabs { margin-bottom: 10px; }
+    .tab, .ghost-button, .primary-button, .secondary-button, .danger-button, .chip { min-height: 32px; border: 1px solid var(--line-dark); border-radius: 6px; background: #fff; color: var(--ink); padding: 6px 10px; }
+    .primary-button { border-color: var(--accent); background: var(--accent); color: #fff; }
+    .secondary-button { background: var(--soft); }
+    .danger-button { border-color: var(--bad); color: var(--bad); }
+    .tab[aria-pressed="true"], .chip.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+
+    .summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
+    .summary-card, .filter-panel, .table-wrap, .detail-pane, .doc-item, .panel, .drawer, .modal { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); }
+    .summary-card { min-height: 82px; padding: 12px; }
+    .summary-card strong { display: block; margin-top: 8px; font-size: 22px; }
+    .main-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(390px, .75fr); gap: 12px; align-items: start; }
+
+    .filter-panel { padding: 10px; margin-bottom: 10px; }
+    .field { min-height: 32px; border: 1px solid var(--line); border-radius: 6px; background: #fff; padding: 6px 9px; color: var(--muted); }
+    .filter-grid { margin-top: 10px; display: none; align-items: stretch; }
+    .filter-grid.open { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .filter-item { border: 1px solid var(--line); border-radius: 6px; padding: 8px; background: #fff; }
+    .filter-item label { display: block; color: var(--muted); font-size: 12px; margin-bottom: 5px; }
+    .filter-item select, .filter-item input { width: 100%; min-height: 30px; border: 1px solid var(--line); border-radius: 6px; padding: 5px 7px; color: var(--ink); background: #fff; }
+    .applied-summary { margin-top: 10px; display: none; gap: 8px; }
+    .applied-summary.show { display: flex; }
+
+    .table { display: grid; grid-template-columns: 1.4fr .75fr .75fr .8fr .85fr .9fr; min-width: 780px; }
+    .cell { min-height: 48px; padding: 10px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 6px; }
+    .head { min-height: 40px; background: var(--soft); color: var(--muted); font-weight: 700; border-top: 0; }
+    .contract-row { display: contents; }
+    .contract-row.selected .cell { background: var(--accent-soft); }
+
+    .status, .risk, .tag { display: inline-flex; align-items: center; justify-content: center; min-height: 24px; border-radius: 999px; padding: 2px 8px; border: 1px solid var(--line); white-space: nowrap; font-size: 12px; }
+    .risk.high { border-color: #f1a29b; background: var(--bad-soft); color: var(--bad); }
+    .risk.mid, .status.pending { border-color: #e7c56f; background: var(--warn-soft); color: var(--warn); }
+    .risk.low, .status.done { border-color: #8fd6ad; background: var(--ok-soft); color: var(--ok); }
+
+    .detail-pane { position: relative; padding: 12px; min-height: 690px; }
+    .section { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px; }
+    .kv { display: grid; grid-template-columns: 92px minmax(0, 1fr); row-gap: 8px; column-gap: 10px; color: var(--muted); }
+    .kv strong { color: var(--ink); font-weight: 400; }
+    .attachment-list, .log-list, .reminder-list { display: grid; gap: 8px; }
+    .attachment-item, .log-item, .reminder-item { border: 1px solid var(--line); border-radius: 6px; background: #fff; padding: 9px; }
+    .attachment-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+    .log-item { display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: 8px; }
+    .small { color: var(--muted); font-size: 12px; }
+
+    .wire-target { position: relative; outline: 0 solid transparent; transition: background .16s ease, outline-color .16s ease; }
+    .wire-target.is-active { outline: 2px solid var(--accent); background-color: var(--accent-soft); }
+    .pin { width: 24px; height: 24px; border-radius: 999px; display: inline-grid; place-items: center; background: #111827; color: #fff; font-size: 12px; font-weight: 700; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--line-dark); position: absolute; top: -10px; right: -10px; z-index: 3; }
+    body.hide-pins .pin { display: none; }
+
+    .doc-panel h2 { margin: 18px 0 8px; font-size: 14px; }
+    .doc-item { padding: 10px 10px 10px 42px; margin: 8px 0; position: relative; }
+    .doc-item::before { content: attr(data-pin); position: absolute; left: 10px; top: 10px; width: 22px; height: 22px; border-radius: 999px; display: grid; place-items: center; background: #111827; color: #fff; font-weight: 700; font-size: 12px; }
+    .doc-item.is-active { border-color: var(--accent); background: var(--accent-soft); }
+
+    .drawer-backdrop, .modal-backdrop { position: fixed; inset: 0; display: none; background: rgba(15, 23, 42, .28); z-index: 10; }
+    .drawer-backdrop.open, .modal-backdrop.open { display: block; }
+    .drawer { position: absolute; right: 0; top: 0; height: 100%; width: min(520px, 92vw); border-radius: 0; padding: 16px; overflow: auto; }
+    .file-preview { min-height: 260px; border: 1px dashed var(--line-dark); border-radius: 6px; background: repeating-linear-gradient(-45deg, #fff, #fff 10px, var(--soft) 10px, var(--soft) 20px); padding: 14px; color: var(--muted); }
+    .modal-backdrop { align-items: center; justify-content: center; padding: 24px; }
+    .modal-backdrop.open { display: flex; }
+    .modal { width: min(520px, 100%); padding: 16px; }
+    textarea { width: 100%; min-height: 76px; border: 1px solid var(--line); border-radius: 6px; padding: 8px; resize: vertical; background: #fff; }
+    .modal .actions, .drawer .actions { justify-content: flex-end; margin-top: 12px; }
+    .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); display: none; min-width: 260px; border: 1px solid var(--line-dark); border-radius: 6px; background: #fff; padding: 10px 14px; z-index: 11; }
+    .toast.show { display: block; }
+
+    @media (max-width: 920px) {
+      .shell { display: block; }
+      .prototype { padding: 10px; }
+      .doc-panel { position: static; height: auto; border-left: 0; border-top: 1px solid var(--line); }
+      .app-frame { min-width: 0; }
+      .layout, .main-grid, .summary-grid, .filter-grid.open { grid-template-columns: 1fr; }
+      .side-nav { border-right: 0; border-bottom: 1px solid var(--line); }
+      .table-wrap { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="prototype" aria-label="企业合同审批与风险跟踪后台 Step B 线框">
+      <div class="app-frame">
+        <header class="topbar">
+          <div class="brand">
+            <h1>企业合同审批与风险跟踪后台</h1>
+            <p>Step B 低保真线框：高级筛选、附件预览、催办、操作记录。</p>
+          </div>
+          <div class="toolbar">
+            <button type="button" class="ghost-button" data-toggle-pins>隐藏标注</button>
+            <button type="button" class="secondary-button">当前身份：业务负责人</button>
+          </div>
+        </header>
+
+        <div class="layout">
+          <aside class="side-nav" aria-label="后台导航">
+            <button type="button" class="nav-item active">合同审批</button>
+            <button type="button" class="nav-item">风险条款</button>
+            <button type="button" class="nav-item">到期提醒</button>
+            <button type="button" class="nav-item">材料中心</button>
+            <button type="button" class="nav-item">操作日志</button>
+          </aside>
+
+          <section class="workbench">
+            <p class="notice">本步只补充扩展交互，不处理 Step C 的异常状态，也不进入高保真视觉。</p>
+
+            <div class="summary-grid wire-target" data-anno="2">
+              <span class="pin">2</span>
+              <article class="summary-card"><span class="small">筛选结果</span><strong data-result-count>8</strong><span class="small">高风险 + 待我处理</span></article>
+              <article class="summary-card"><span class="small">缺材料</span><strong>3</strong><span class="small">供应商授权书 / 报价单</span></article>
+              <article class="summary-card"><span class="small">可催办</span><strong>5</strong><span class="small">停留超过 24 小时</span></article>
+              <article class="summary-card"><span class="small">最近操作</span><strong>18</strong><span class="small">近 7 天记录</span></article>
+            </div>
+
+            <div class="main-grid">
+              <section>
+                <div class="tabs">
+                  <button type="button" class="tab" data-scope="mine" aria-pressed="true">待我处理</button>
+                  <button type="button" class="tab" data-scope="all" aria-pressed="false">全部合同</button>
+                </div>
+
+                <div class="filter-panel wire-target" data-anno="1">
+                  <span class="pin">1</span>
+                  <div class="toolbar">
+                    <span class="field">合同名称 / 编号 / 相对方</span>
+                    <button type="button" class="secondary-button" data-toggle-advanced>展开高级筛选</button>
+                    <button type="button" class="primary-button" data-apply-filter>应用筛选</button>
+                    <button type="button" class="ghost-button" data-reset-filter>重置</button>
+                  </div>
+                  <div class="filter-grid" data-advanced>
+                    <div class="filter-item"><label>合同类型</label><select><option>采购合同</option><option>服务合同</option><option>软件授权</option></select></div>
+                    <div class="filter-item"><label>风险等级</label><select><option>高风险</option><option>中风险</option><option>低风险</option></select></div>
+                    <div class="filter-item"><label>当前节点</label><select><option>业务负责人审批</option><option>采购补充材料</option><option>法务审核</option></select></div>
+                    <div class="filter-item"><label>到期区间</label><input value="未来 30 天"></div>
+                    <div class="filter-item"><label>材料状态</label><select><option>缺材料</option><option>材料齐全</option></select></div>
+                    <div class="filter-item"><label>停留时长</label><select><option>超过 24 小时</option><option>超过 48 小时</option></select></div>
+                    <div class="filter-item"><label>负责人</label><input value="王明 / 李青"></div>
+                    <div class="filter-item"><label>金额区间</label><input value="100 万以上"></div>
+                  </div>
+                  <div class="applied-summary" data-applied-summary>
+                    <span class="tag">高风险</span><span class="tag">待我处理</span><span class="tag">缺材料</span><span class="tag">未来 30 天到期</span>
+                  </div>
+                </div>
+
+                <div class="table-wrap">
+                  <div class="table" role="table" aria-label="合同列表">
+                    <div class="cell head">合同</div><div class="cell head">状态</div><div class="cell head">风险</div><div class="cell head">当前节点</div><div class="cell head">材料</div><div class="cell head">操作</div>
+                    <div class="contract-row selected" data-row="supply">
+                      <div class="cell"><strong>年度设备采购框架合同</strong><span class="small">HT-2026-0418</span></div>
+                      <div class="cell"><span class="status pending">待我审批</span></div>
+                      <div class="cell"><span class="risk high">高风险</span></div>
+                      <div class="cell">业务负责人审批</div>
+                      <div class="cell">3/4 已齐</div>
+                      <div class="cell"><button type="button" class="ghost-button" data-select="supply">查看</button></div>
+                    </div>
+                    <div class="contract-row" data-row="service">
+                      <div class="cell"><strong>售后服务外包协议</strong><span class="small">HT-2026-0399</span></div>
+                      <div class="cell"><span class="status pending">待补充材料</span></div>
+                      <div class="cell"><span class="risk mid">中风险</span></div>
+                      <div class="cell">采购补充材料</div>
+                      <div class="cell">2/5 已齐</div>
+                      <div class="cell"><button type="button" class="ghost-button" data-select="service">查看</button></div>
+                    </div>
+                    <div class="contract-row" data-row="license">
+                      <div class="cell"><strong>软件授权续签合同</strong><span class="small">HT-2026-0371</span></div>
+                      <div class="cell"><span class="status done">法务已审</span></div>
+                      <div class="cell"><span class="risk low">低风险</span></div>
+                      <div class="cell">采购审核</div>
+                      <div class="cell">4/4 已齐</div>
+                      <div class="cell"><button type="button" class="ghost-button" data-select="license">查看</button></div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <aside class="detail-pane" aria-label="合同详情扩展交互">
+                <section>
+                  <h2 data-detail-title>年度设备采购框架合同</h2>
+                  <div class="kv">
+                    <span>合同编号</span><strong data-detail-code>HT-2026-0418</strong>
+                    <span>相对方</span><strong data-detail-party>华东工业设备有限公司</strong>
+                    <span>当前节点</span><strong data-detail-node>业务负责人审批</strong>
+                    <span>材料状态</span><strong data-detail-material>3/4 已齐，缺风险条款修改说明</strong>
+                  </div>
+                </section>
+
+                <section class="section wire-target" data-anno="3">
+                  <span class="pin">3</span>
+                  <h3>附件材料</h3>
+                  <div class="attachment-list" data-attachments>
+                    <div class="attachment-item"><div><strong>合同正文 v3.pdf</strong><br><span class="small">法务审核后版本，2.4 MB</span></div><button type="button" class="ghost-button" data-preview="合同正文 v3.pdf">预览</button></div>
+                    <div class="attachment-item"><div><strong>供应商授权书.pdf</strong><br><span class="small">采购上传，已验收</span></div><button type="button" class="ghost-button" data-preview="供应商授权书.pdf">预览</button></div>
+                    <div class="attachment-item"><div><strong>风险条款修改说明</strong><br><span class="small">待补充</span></div><button type="button" class="secondary-button" data-remind="material">催补</button></div>
+                  </div>
+                </section>
+
+                <section class="section wire-target" data-anno="4">
+                  <span class="pin">4</span>
+                  <h3>催办</h3>
+                  <div class="reminder-list">
+                    <div class="reminder-item">
+                      <div class="pill-row"><span class="status pending">停留 28 小时</span><strong>业务负责人审批</strong></div>
+                      <p class="small">可向当前处理人发送一次温和催办，并记录到操作日志。</p>
+                      <button type="button" class="secondary-button" data-open-remind>发送催办</button>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="section wire-target" data-anno="5">
+                  <span class="pin">5</span>
+                  <h3>操作记录</h3>
+                  <div class="toolbar">
+                    <button type="button" class="chip active" data-log-filter="all">全部</button>
+                    <button type="button" class="chip" data-log-filter="approval">审批</button>
+                    <button type="button" class="chip" data-log-filter="material">材料</button>
+                    <button type="button" class="chip" data-log-filter="risk">风险</button>
+                  </div>
+                  <div class="log-list" data-log-list>
+                    <div class="log-item" data-type="risk"><span class="small">06-22 18:05</span><div><strong>法务标记风险条款</strong><br><span class="small">违约责任上限缺失，建议补充赔偿边界。</span></div></div>
+                    <div class="log-item" data-type="material"><span class="small">06-22 16:40</span><div><strong>采购上传供应商授权书</strong><br><span class="small">附件已归档到材料中心。</span></div></div>
+                    <div class="log-item" data-type="approval"><span class="small">06-21 15:30</span><div><strong>采购审核通过</strong><br><span class="small">进入法务审核节点。</span></div></div>
+                  </div>
+                </section>
+              </aside>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <aside class="doc-panel" aria-label="Step B 原型说明文档">
+      <h1>右侧说明文档</h1>
+      <p>本页是 Step B 低保真线框，用于确认扩展交互是否满足日常协同。</p>
+      <h2>原型说明</h2>
+      <p class="small">Step B 在 Step A 主流程基础上补充高级筛选、附件预览、催办、操作记录，不处理异常状态。</p>
+      <h2>功能说明</h2>
+      <p class="small">用户可以展开筛选条件、查看结果摘要、预览合同附件、向处理人发送催办，并用日志筛选快速定位历史动作。</p>
+      <h2>字段说明</h2>
+      <p class="small">新增关注字段包括材料状态、附件名称、附件版本、停留时长、操作类型、操作人和操作时间。</p>
+      <h2>交互说明</h2>
+      <p class="small">高级筛选展开后可应用条件；附件预览以抽屉呈现；催办以弹窗确认；操作记录可按审批、材料、风险过滤。</p>
+      <h2>编号标注</h2>
+      <div class="doc-item" data-anno="1" data-pin="1"><strong>高级筛选</strong><br>把合同类型、风险等级、当前节点、材料状态、停留时长等条件集中在可展开区域。</div>
+      <div class="doc-item" data-anno="2" data-pin="2"><strong>筛选结果摘要</strong><br>筛选后用指标和条件标签说明当前列表口径，降低误判风险。</div>
+      <div class="doc-item" data-anno="3" data-pin="3"><strong>附件预览</strong><br>从详情区直接预览合同正文、授权书等材料，避免离开审批上下文。</div>
+      <div class="doc-item" data-anno="4" data-pin="4"><strong>催办动作</strong><br>催办需要确认并写入日志，界面不做排名或强压式问责。</div>
+      <div class="doc-item" data-anno="5" data-pin="5"><strong>操作记录</strong><br>日志用于审计追溯，可按审批、材料、风险筛选。</div>
+      <h2>验收点</h2>
+      <p class="small">确认是否能完成高级筛选、附件预览、催办和日志筛选；确认这些扩展交互没有改变 Step A 的审批主路径。</p>
+    </aside>
+  </main>
+
+  <div class="drawer-backdrop" data-drawer="preview">
+    <aside class="drawer" aria-label="附件预览抽屉">
+      <h2 data-preview-title>附件预览</h2>
+      <p class="small">低保真占位：此处表示 PDF / 图片 / 文档预览，不加载真实文件。</p>
+      <div class="file-preview" data-preview-body>合同正文预览区域：展示页码、签署主体、关键条款所在页。</div>
+      <div class="actions"><button type="button" class="ghost-button" data-close-panel>关闭</button><button type="button" class="secondary-button">下载副本</button></div>
+    </aside>
+  </div>
+
+  <div class="modal-backdrop" data-modal="remind" role="dialog" aria-modal="true" aria-label="发送催办">
+    <div class="modal">
+      <h2>发送催办</h2>
+      <p class="small">催办会发送给当前处理人，并写入操作记录。文案保持提醒性质，不做惩罚表达。</p>
+      <textarea data-remind-text>请尽快处理该合同审批，当前节点已停留超过 24 小时。如需补充信息请在系统内说明。</textarea>
+      <div class="actions"><button type="button" class="ghost-button" data-close-panel>取消</button><button type="button" class="secondary-button" data-confirm-remind>确认发送</button></div>
+    </div>
+  </div>
+
+  <div class="toast" data-toast>操作已记录</div>
+
+  <script>
+    const detailData = {
+      supply: {
+        title: '年度设备采购框架合同',
+        code: 'HT-2026-0418',
+        party: '华东工业设备有限公司',
+        node: '业务负责人审批',
+        material: '3/4 已齐，缺风险条款修改说明'
+      },
+      service: {
+        title: '售后服务外包协议',
+        code: 'HT-2026-0399',
+        party: '北辰服务管理有限公司',
+        node: '采购补充材料',
+        material: '2/5 已齐，缺报价单、授权书、服务清单'
+      },
+      license: {
+        title: '软件授权续签合同',
+        code: 'HT-2026-0371',
+        party: '云启软件科技有限公司',
+        node: '采购审核',
+        material: '4/4 已齐'
+      }
+    };
+
+    const syncActive = (id, on) => {
+      document.querySelectorAll(`[data-anno="${id}"]`).forEach((node) => node.classList.toggle('is-active', on));
+    };
+
+    document.querySelectorAll('[data-anno]').forEach((node) => {
+      const id = node.getAttribute('data-anno');
+      node.addEventListener('mouseenter', () => syncActive(id, true));
+      node.addEventListener('mouseleave', () => syncActive(id, false));
+      node.addEventListener('focusin', () => syncActive(id, true));
+      node.addEventListener('focusout', () => syncActive(id, false));
+    });
+
+    document.querySelector('[data-toggle-pins]').addEventListener('click', (event) => {
+      document.body.classList.toggle('hide-pins');
+      event.currentTarget.textContent = document.body.classList.contains('hide-pins') ? '显示标注' : '隐藏标注';
+    });
+
+    document.querySelector('[data-toggle-advanced]').addEventListener('click', (event) => {
+      const panel = document.querySelector('[data-advanced]');
+      panel.classList.toggle('open');
+      event.currentTarget.textContent = panel.classList.contains('open') ? '收起高级筛选' : '展开高级筛选';
+    });
+
+    document.querySelector('[data-apply-filter]').addEventListener('click', () => {
+      document.querySelector('[data-applied-summary]').classList.add('show');
+      document.querySelector('[data-result-count]').textContent = '5';
+      showToast('已应用高级筛选');
+    });
+
+    document.querySelector('[data-reset-filter]').addEventListener('click', () => {
+      document.querySelector('[data-applied-summary]').classList.remove('show');
+      document.querySelector('[data-result-count]').textContent = '8';
+      showToast('筛选已重置');
+    });
+
+    document.querySelectorAll('[data-scope]').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('[data-scope]').forEach((item) => item.setAttribute('aria-pressed', item === tab ? 'true' : 'false'));
+        showToast(tab.dataset.scope === 'mine' ? '已切换到待我处理' : '已切换到全部合同');
+      });
+    });
+
+    document.querySelectorAll('[data-select]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const id = button.dataset.select;
+        const data = detailData[id];
+        document.querySelectorAll('.contract-row').forEach((row) => row.classList.toggle('selected', row.dataset.row === id));
+        document.querySelector('[data-detail-title]').textContent = data.title;
+        document.querySelector('[data-detail-code]').textContent = data.code;
+        document.querySelector('[data-detail-party]').textContent = data.party;
+        document.querySelector('[data-detail-node]').textContent = data.node;
+        document.querySelector('[data-detail-material]').textContent = data.material;
+      });
+    });
+
+    document.querySelectorAll('[data-preview]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelector('[data-preview-title]').textContent = button.dataset.preview;
+        document.querySelector('[data-preview-body]').textContent = `${button.dataset.preview} 预览区域：展示附件摘要、版本、上传人和关键页占位。`;
+        document.querySelector('[data-drawer="preview"]').classList.add('open');
+      });
+    });
+
+    document.querySelectorAll('[data-open-remind], [data-remind]').forEach((button) => {
+      button.addEventListener('click', () => document.querySelector('[data-modal="remind"]').classList.add('open'));
+    });
+
+    document.querySelectorAll('[data-close-panel]').forEach((button) => {
+      button.addEventListener('click', closePanels);
+    });
+
+    document.querySelector('[data-confirm-remind]').addEventListener('click', () => {
+      closePanels();
+      const list = document.querySelector('[data-log-list]');
+      list.insertAdjacentHTML('afterbegin', '<div class="log-item" data-type="approval"><span class="small">刚刚</span><div><strong>已发送催办</strong><br><span class="small">系统向当前处理人发送审批提醒。</span></div></div>');
+      showToast('催办已发送并写入操作记录');
+    });
+
+    document.querySelectorAll('[data-log-filter]').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const type = chip.dataset.logFilter;
+        document.querySelectorAll('[data-log-filter]').forEach((item) => item.classList.toggle('active', item === chip));
+        document.querySelectorAll('[data-log-list] .log-item').forEach((item) => {
+          item.style.display = type === 'all' || item.dataset.type === type ? 'grid' : 'none';
+        });
+      });
+    });
+
+    function closePanels() {
+      document.querySelectorAll('.drawer-backdrop, .modal-backdrop').forEach((panel) => panel.classList.remove('open'));
+    }
+
+    function showToast(message) {
+      const toast = document.querySelector('[data-toast]');
+      toast.textContent = message;
+      toast.classList.add('show');
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+  </script>
+</body>
+</html>
