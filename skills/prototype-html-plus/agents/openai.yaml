@@ -1,0 +1,8 @@
+interface:
+  display_name: "Prototype HTML Plus"
+  short_description: "Interactive HTML prototypes with side docs."
+  default_prompt: "Use $prototype-html-plus to turn this product idea into an interactive HTML prototype with side documentation."
+
+policy:
+  allow_implicit_invocation: true
+

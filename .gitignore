@@ -1,0 +1,28 @@
+# Local planning and scratch material
+*.local.md
+local-notes/
+scratch/
+
+# Codex and agent runtime traces
+.codex/
+.agents/
+
+# Preview, test, and build output
+dist/
+coverage/
+playwright-report/
+test-results/
+screenshots/
+renders/
+*.log
+
+# Dependencies and caches
+node_modules/
+.cache/
+.turbo/
+
+# System and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+
