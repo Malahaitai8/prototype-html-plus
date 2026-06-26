@@ -83,3 +83,47 @@
 ### Git 提交
 - Commit: `docs: add reference skill analysis`
 - 分支: `main`
+
+## 2026-06-26 15:22 - Step 1 Supplemental C-Side References and Scope Convergence
+
+### 本次完成
+- 根据用户反馈补充 C 端参考方向。
+- 将高保真和线框稿的适用范围明确为同时覆盖 B 端与 C 端。
+- 将标注方案收敛为仅使用编号圆点标注，移除长连线方案。
+- 新增 `built-in-skills/design-system-reference.md`，用于说明按场景选择参考，避免一次性加载全部设计系统。
+- 更新 Step 1 测试 Prompt，增加 C 端参考、场景路由和编号圆点收敛的验收点。
+- 根据用户追问补细 B 端场景路由：CRM / ERP / OA、BI / 监控、金融 / 风控、内部协作、工业 / IoT 等分别选择不同参考。
+
+### 当前效果
+- Skill 已明确：先判断 B 端 / C 端和平台，再读取对应设计参考。
+- C 端参考补充为 Apple HIG、Material Design 3、Ant Design Mobile、WeUI、TDesign Mobile。
+- V1 不再保留 SVG 长连线方向。
+
+### 测试方式
+- 检查 `docs/reference-skill-analysis.md` 是否包含 C 端参考和场景路由。
+- 检查 `skills/prototype-html-plus/built-in-skills/design-system-reference.md` 是否写明按场景选择参考。
+- 检查 `SKILL.md` 是否要求不一次性加载所有设计系统。
+- 检查 `DECISIONS.md` 是否记录 C 端补充和长连线移除。
+- 执行 `rg` 确认不再保留“长连线可选”语义。
+- 执行 `git diff --check`、`git status --short`。
+
+### 测试结果
+- 已确认 C 端参考包含 Apple Human Interface Guidelines、Material Design 3、Ant Design Mobile、WeUI、TDesign Mobile。
+- 已确认 `SKILL.md` 和 `built-in-skills/design-system-reference.md` 写明按场景选择参考，避免一次性加载全部设计系统。
+- 已补充 B 端细分路由，避免后台原型一律只参考单一设计系统。
+- 已确认当前“长连线”相关表述均为禁止 / 移除语义，不再作为可选方案保留。
+- `git diff --check` 通过；仅有 Windows 行尾转换提示，无空白错误。
+- 用户已确认可以提交并推送，包含 `PROGRESS.md`。
+
+### 遇到的问题 / 瓶颈
+- 上一步未按用户约定在 commit/push 前等待确认；后续改为“产出后先验收，确认后再提交”。
+
+### 暂未解决
+- 无。
+
+### 下一步目标
+- 进入 Step 2 前先确认需求确认能力的具体规则。
+
+### Git 提交
+- Commit: `docs: refine design reference routing`
+- 分支: `main`

@@ -16,6 +16,9 @@ Agent 应只评审 Step 1 调研文档和决策记录，不应开始实现需求
 - 确认每个参考源是否包含“可借鉴点、不照搬/风险、落地策略”。
 - 确认 `DECISIONS.md` 是否记录了关键取舍。
 - 确认文档是否明确“不复制参考仓库代码”。
+- 确认 C 端参考是否补充了 Apple HIG、Material Design 3、Ant Design Mobile、WeUI、TDesign Mobile。
+- 确认 Skill 是否写清楚“按场景选择参考，不一次性加载全部设计系统”。
+- 确认 V1 标注方案是否已收敛为编号圆点，不再保留长连线。
 - 给出是否可以进入 Step 2 的结论。
 
 # 人工验收点
@@ -24,12 +27,14 @@ Agent 应只评审 Step 1 调研文档和决策记录，不应开始实现需求
 - 文档没有把 GitHub 进度记录或测试线程机制描述成 Skill 用户能力。
 - 对无法直接访问的参考源有如实说明。
 - 后续文件映射清晰：知道哪些规则将进入 `requirement-intake.md`、`wireframe.md`、`hi-fi.md`、`region-rebuild.md`、`annotation-doc.md`、`frontend-quality.md` 和 `design-system-reference.md`。
+- C 端与 B 端都有参考路径，且不同平台不会混用参考。
 
 # 失败表现
 
 - 只列仓库名，没有落地策略。
 - 缺少官方设计系统参考。
 - 没有记录 LICENSE / 不复制代码风险。
+- 没有 C 端参考，或把所有设计系统都作为默认上下文。
+- 仍保留 SVG 长连线方案。
 - 把测试 Prompt、GitHub push、`PROGRESS.md` 写成了 Skill 面向最终用户的能力。
 - Agent 直接开始 Step 2 实现。
-

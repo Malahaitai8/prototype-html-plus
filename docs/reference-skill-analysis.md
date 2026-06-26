@@ -6,9 +6,11 @@ Step 1 目标是把参考仓库和官方设计系统转化为 `prototype-html-pl
 
 - V1 应采用“入口 Skill + built-in skills + starter components + examples”的分层结构，避免把所有规则塞进 `SKILL.md`。
 - 原型产物应默认是“左侧可交互 HTML + 右侧说明文档”，并把说明文档作为交付的一部分，而不是装饰栏。
-- 复杂后台、数据看板、局部截图复刻默认使用编号圆点标注；SVG 长连线只作为简单页面的可选方案。
-- 线框稿模式拆成两种风格：手绘感线框和结构线框；都强调真实业务文案、可点击状态、结构优先。
-- 高保真模式默认走 B 端后台基线，优先参考 Ant Design；数据密集场景参考 Carbon；企业 SaaS / Microsoft 风格参考 Fluent UI。
+- 所有场景统一使用编号圆点标注，不保留 SVG 长连线方案。
+- 线框稿和高保真都同时面向 B 端与 C 端；线框稿强调结构和路径，高保真强调真实产品观感。
+- 设计系统参考必须按场景路由加载，不能把所有参考一股脑塞进上下文。
+- B 端后台优先参考 Ant Design；数据密集场景参考 Carbon；企业 SaaS / Microsoft 风格参考 Fluent UI。
+- C 端 iOS / App 参考 Apple HIG；Android / 跨端 Material 风格参考 Material Design 3；中文移动 H5 / 小程序参考 Ant Design Mobile、WeUI、TDesign Mobile。
 - 前端质量规则需要单独沉淀，覆盖 typography、spacing、density、responsive、状态、可访问性和“反 AI 味”。
 - 所有参考源只作为概念和方法论参考；不得直接复制代码、样式表、示例页面或文案。
 
@@ -30,7 +32,7 @@ Step 1 目标是把参考仓库和官方设计系统转化为 `prototype-html-pl
 
 不照搬 / 风险：
 
-- SVG 长连线在复杂后台页面、表格、看板中容易交叉、偏移或遮挡。
+- SVG 长连线在复杂页面、表格、看板、移动端页面中容易交叉、偏移或遮挡；V1 不采用。
 - 单文件 HTML 可以作为 V1 demo 的优先策略，但不能阻碍后续组件化 starter 的扩展。
 - 不复制其 HTML、CSS、图标或示例文案。
 
@@ -38,7 +40,7 @@ Step 1 目标是把参考仓库和官方设计系统转化为 `prototype-html-pl
 
 - `annotation-doc.md` 继承“原型 + 说明文档绑定”的原则。
 - starter demo 可以优先保持单 HTML 可预览。
-- 默认不采用长连线，转向编号圆点；仅在简单页面保留连线选项。
+- 默认采用编号圆点，不提供长连线选项。
 
 ### wsdlp46/prototype-html-pin
 
@@ -67,7 +69,7 @@ Step 1 目标是把参考仓库和官方设计系统转化为 `prototype-html-pl
 
 - V1 将编号圆点作为默认标注机制。
 - `pin-annotation.js` 未来只实现通用关系绑定，不承载具体业务规则。
-- 复杂页面默认禁止长连线，避免交付时视觉噪音过高。
+- 所有页面统一禁止长连线，避免交付时视觉噪音过高。
 
 ### JimLiu/baoyu-design
 
@@ -190,7 +192,30 @@ Step 1 目标是把参考仓库和官方设计系统转化为 `prototype-html-pl
 - `region-rebuild.md` 采用先分析截图、再确认保留/改动、最后实现的流程。
 - 高保真模式默认克制，避免紫蓝渐变、玻璃拟态、模板化卡片堆砌等常见问题。
 
-## 官方设计系统参考
+## 官方设计系统与 C 端参考
+
+### 参考加载路由
+
+使用设计系统参考前，先判断产品场景，只读取最相关的 1-2 个参考，不全量加载：
+
+- 中文 B 端后台 / 管理系统 / 表格表单：优先 Ant Design。
+- 数据密集型后台 / 监控 / 风控 / 工业 / 金融分析：Ant Design + Carbon。
+- 企业 SaaS / Microsoft 风格 / 办公协作：Fluent UI。
+- CRM / ERP / OA / 审批流：Ant Design。
+- BI / 指标监控 / 运营分析：Carbon + Ant Design。
+- 金融 / 风控 / 交易后台 / 清结算：Carbon 优先，Ant Design 补表单和操作区。
+- 内部协作 / 文档 / 日程 / 任务：Fluent UI。
+- 工业 / 运维 / IoT 控制台：Carbon 优先，Ant Design 补后台操作控件。
+- C 端 iOS App / 类原生 iPhone 体验：Apple HIG。
+- C 端 Android App / 跨端 Material 风格 / Google 生态：Material Design 3。
+- 中文移动 Web / H5 / 营销活动 / 轻应用：Ant Design Mobile。
+- 微信生态 / 小程序 / 微信内 H5：WeUI。
+- 腾讯系 C 端或移动 Web / Vue 技术栈参考：TDesign Mobile。
+
+若用户没有说明平台：
+
+- B 端默认走 Ant Design-like 基线。
+- C 端默认先追问平台；用户选择“帮我推荐”时，移动 Web / H5 默认参考 Ant Design Mobile，App 默认按 iOS / Android 目标平台选择 Apple HIG 或 Material Design 3。
 
 ### Ant Design
 
@@ -259,25 +284,141 @@ Step 1 目标是把参考仓库和官方设计系统转化为 `prototype-html-pl
 - `design-system-reference.md` 未来将 Fluent 作为场景分流选项。
 - 高保真页面在办公协作类 brief 中可采用更克制、稳定、浅色的 Fluent-like 视觉基线。
 
+### Apple Human Interface Guidelines
+
+来源：
+
+- `https://developer.apple.com/design/`
+- `https://developer.apple.com/design/human-interface-guidelines/`
+
+可借鉴点：
+
+- 适合 iOS / iPadOS / Apple 平台 C 端 App 原型。
+- 强调平台一致性、原生导航、手势、系统控件、图标和可访问性。
+- Apple 官方设计页明确提供 Human Interface Guidelines、设计资源、SF Symbols 等平台资源。
+
+不照搬 / 风险：
+
+- 不适合默认套到 Android、微信 H5 或普通 Web。
+- V1 不导入 Apple 设计资源或图标库，只借鉴平台体验原则。
+
+落地策略：
+
+- 当用户明确要 iOS App、Apple 风格、类原生移动 App 时才读取 Apple HIG。
+- C 端线框稿可以借鉴其导航和手势结构，高保真可借鉴 iOS 平台层级和控件感。
+
+### Material Design 3
+
+来源：
+
+- `https://m3.material.io/`
+- `https://github.com/material-components/material-web`
+
+可借鉴点：
+
+- 适合 Android App、Material 风格 C 端产品和跨端 Web / App 原型。
+- Material Web 说明其基于 Material 3，用于构建美观且可访问的 Web 应用。
+- 对色彩、形状、动效、触控目标、表单和状态有完整体系。
+
+不照搬 / 风险：
+
+- Material 视觉识别强，不能默认用于中文 H5、微信生态或 iOS 原型。
+- V1 不引入 Material Web 依赖。
+
+落地策略：
+
+- 当用户明确 Android、Google 风格、Material 风格或跨端 App 时再参考。
+- 用其触控目标、状态反馈、底部导航、卡片和表单原则指导 C 端原型。
+
+### Ant Design Mobile
+
+来源：
+
+- `https://mobile.ant.design/`
+- `https://github.com/ant-design/ant-design-mobile`
+
+可借鉴点：
+
+- 官方定位为构建 mobile web apps 的基础 UI blocks。
+- 适合中文 C 端 H5、移动 Web、轻应用和活动型页面。
+- 组件强调性能、可定制、原子化能力、手势和细腻动画。
+
+不照搬 / 风险：
+
+- 不等于桌面 Ant Design 的移动缩小版，不能把 B 端表格思维硬塞到 C 端。
+- V1 不引入 `antd-mobile` 依赖。
+
+落地策略：
+
+- 当用户提出移动 Web / H5 / 国内 C 端流程时优先参考。
+- 高保真 C 端 H5 默认可以参考其组件密度、表单、列表、弹层和反馈模式。
+
+### WeUI
+
+来源：
+
+- `https://weui.io/`
+- `https://github.com/Tencent/weui`
+
+可借鉴点：
+
+- WeUI 是微信官方设计团队为微信 Web 开发设计的 UI 框架。
+- 包含 button、cell、dialog、progress、toast、article、actionsheet、icon 等移动 Web 常用组件。
+- 适合微信生态、小程序、公众号 H5、支付/授权/表单类流程。
+
+不照搬 / 风险：
+
+- 微信生态气质强，不适合作为所有 C 端默认视觉。
+- V1 不复制 WeUI 组件代码。
+
+落地策略：
+
+- 当用户明确微信、公众号、小程序、微信内 H5 时参考。
+- 用其 cell 列表、toast、dialog、actionsheet、表单和确认反馈模式指导原型。
+
+### TDesign Mobile
+
+来源：
+
+- `https://tdesign.tencent.com/mobile-vue/overview`
+- `https://github.com/Tencent/tdesign-mobile-vue`
+
+可借鉴点：
+
+- TDesign Mobile Vue 是面向 Vue 3 和 mobile web application 的 UI component library。
+- 支持移动 Web 交互、高质量组件、跨框架一致 API / UI、暗色模式和自定义主题。
+- 适合腾讯系、Vue 技术栈、移动 Web 和中性 C 端界面参考。
+
+不照搬 / 风险：
+
+- 技术栈参考不应变成 V1 依赖选择；本项目仍优先生成独立 HTML 原型。
+- 不应同时加载 WeUI、Ant Design Mobile、TDesign Mobile，除非用户要求对比方案。
+
+落地策略：
+
+- 当用户明确腾讯系视觉、Vue 移动组件或移动 Web 主题化时参考。
+- 用其暗色模式、主题化和跨端一致性作为 C 端高保真补充。
+
 ## 对 V1 文件的落地映射
 
 - `SKILL.md`：只做入口、能力路由和约束，不堆叠所有细则。
 - `system-prompt.md`：放总方法论和跨模式规则。
 - `built-in-skills/requirement-intake.md`：沉淀表单化提问、推荐和跳过初版规则。
 - `built-in-skills/wireframe.md`：沉淀手绘线框和结构线框。
-- `built-in-skills/hi-fi.md`：沉淀 B 端高保真基线和设计系统参考分流。
+- `built-in-skills/hi-fi.md`：沉淀 B 端和 C 端高保真基线。
 - `built-in-skills/region-rebuild.md`：沉淀截图分析、保留/改动确认、局部实现边界。
 - `built-in-skills/annotation-doc.md`：沉淀右侧说明和编号圆点标注规则。
 - `built-in-skills/frontend-quality.md`：沉淀前端质量、反 AI 味、状态、响应式和可访问性检查。
-- `built-in-skills/design-system-reference.md`：沉淀 Ant Design / Carbon / Fluent 的场景选择。
+- `built-in-skills/design-system-reference.md`：沉淀 B 端 / C 端设计系统的场景路由，要求只加载相关参考。
 - `references/codex.md`：沉淀本地预览、浏览器检查、控制台错误检查和交互验收。
 
 ## Step 1 决策
 
 - V1 保持轻量：不引入真实 UI 组件库依赖。
-- 默认 B 端高保真参考 Ant Design；数据密集场景参考 Carbon；企业 SaaS / Microsoft 风格参考 Fluent。
-- 默认标注机制为编号圆点；长 SVG 连线仅作为简单页面可选方案。
-- 线框稿支持手绘线框和结构线框，避免线框稿滑向高保真。
+- B 端高保真默认参考 Ant Design；数据密集场景参考 Carbon；企业 SaaS / Microsoft 风格参考 Fluent。
+- B 端细分路由：CRM / ERP / OA / 审批走 Ant Design；BI / 监控 / 运营分析走 Carbon + Ant Design；金融 / 风控 / 交易走 Carbon 优先；内部协作走 Fluent；工业 / 运维 / IoT 走 Carbon 优先。
+- C 端参考按平台和场景路由：iOS 用 Apple HIG，Android / Material 风格用 Material Design 3，移动 H5 用 Ant Design Mobile，微信生态用 WeUI，腾讯系 / Vue 移动 Web 可参考 TDesign Mobile。
+- 默认标注机制只使用编号圆点，不提供长 SVG 连线方案。
+- 线框稿和高保真均覆盖 B 端与 C 端；线框稿避免滑向高保真，高保真避免无场景套模板。
 - 局部截图复刻必须先确认保留内容和改动内容，不能臆造不可读业务信息。
 - 参考仓库只借鉴思路、结构和流程；不复制代码、CSS、示例 HTML 或文案。
-
