@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hi-Fi Admin Shell - prototype-html-plus</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --ink: #1f2329;
+      --muted: #667085;
+      --line: #d9dfe7;
+      --soft: #f8fafc;
+      --primary: #1677ff;
+      --primary-soft: #e6f4ff;
+      --success: #12a150;
+      --warning: #d48806;
+      --danger: #cf1322;
+      --radius: 6px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--bg); font-size: 14px; line-height: 1.45; }
+    button, input, select { font: inherit; }
+    button { min-height: 32px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); color: var(--ink); cursor: pointer; padding: 6px 12px; }
+    button.primary { border-color: var(--primary); background: var(--primary); color: #fff; }
+    button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .shell { min-height: 100vh; display: grid; grid-template-columns: minmax(860px, 1fr) 360px; }
+    .prototype { padding: 16px; overflow: auto; }
+    .doc-panel { position: sticky; top: 0; height: 100vh; overflow: auto; border-left: 1px solid var(--line); background: var(--panel); padding: 18px; }
+    .app { min-height: calc(100vh - 32px); display: grid; grid-template-columns: 208px minmax(0, 1fr); border: 1px solid var(--line); background: var(--panel); }
+    .sidebar { border-right: 1px solid var(--line); background: #001529; color: rgba(255,255,255,.82); padding: 14px 10px; }
+    .brand { height: 38px; display: flex; align-items: center; padding: 0 10px; color: #fff; font-weight: 700; letter-spacing: 0; }
+    .nav-item { min-height: 36px; display: flex; align-items: center; padding: 0 10px; border-radius: var(--radius); margin: 4px 0; }
+    .nav-item.active { background: #1677ff; color: #fff; }
+    .workspace { display: grid; grid-template-rows: auto 1fr; min-width: 0; }
+    .topbar { min-height: 56px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; gap: 12px; }
+    .content { padding: 16px; display: grid; gap: 14px; align-content: start; background: var(--bg); }
+    h1 { margin: 0; font-size: 20px; }
+    h2 { margin: 0 0 10px; font-size: 15px; }
+    p { margin: 4px 0 0; color: var(--muted); }
+    .command-bar, .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .panel, .doc-item { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); }
+    .panel { padding: 14px; position: relative; }
+    .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .metric { border-left: 3px solid var(--primary); padding-left: 10px; min-height: 58px; }
+    .metric strong { display: block; margin-top: 6px; font-size: 22px; }
+    .field { min-height: 32px; border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 10px; background: #fff; color: var(--ink); }
+    .table { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    .row { display: grid; grid-template-columns: 1.3fr .8fr .8fr .8fr .8fr; gap: 10px; align-items: center; min-height: 44px; padding: 8px 12px; border-top: 1px solid var(--line); }
+    .row:first-child { border-top: 0; background: var(--soft); color: var(--muted); font-weight: 700; }
+    .row.selected { background: var(--primary-soft); }
+    .tag { display: inline-flex; align-items: center; min-height: 22px; border-radius: 999px; padding: 0 8px; background: var(--soft); color: var(--muted); border: 1px solid var(--line); font-size: 12px; }
+    .tag.success { color: var(--success); background: #f0fbf4; border-color: #b7ebc6; }
+    .tag.warning { color: var(--warning); background: #fff7e6; border-color: #ffd591; }
+    .target { position: relative; outline: 0 solid transparent; transition: background .16s ease, outline-color .16s ease; }
+    .target.is-active { outline: 2px solid var(--primary); background: var(--primary-soft); }
+    .pin { position: absolute; top: -10px; right: -10px; z-index: 2; width: 24px; height: 24px; border-radius: 999px; display: grid; place-items: center; background: #111827; color: #fff; border: 2px solid #fff; box-shadow: 0 0 0 1px #8b95a1; font-size: 12px; font-weight: 700; }
+    body.hide-pins .pin { display: none; }
+    .doc-panel h1 { font-size: 18px; }
+    .doc-panel h2 { margin: 18px 0 8px; }
+    .doc-item { padding: 10px 10px 10px 42px; margin: 8px 0; position: relative; }
+    .doc-item::before { content: attr(data-pin); position: absolute; left: 10px; top: 10px; width: 22px; height: 22px; border-radius: 999px; display: grid; place-items: center; background: #111827; color: #fff; font-size: 12px; font-weight: 700; }
+    .doc-item.is-active { border-color: var(--primary); background: var(--primary-soft); }
+    .hidden { display: none !important; }
+    @media (max-width: 1080px) {
+      .shell { display: block; }
+      .doc-panel { position: static; height: auto; border-left: 0; border-top: 1px solid var(--line); }
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .row { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="prototype" aria-label="high fidelity admin shell">
+      <div class="app">
+        <nav class="sidebar" aria-label="main navigation">
+          <div class="brand">Admin Shell</div>
+          <div class="nav-item active">Overview</div>
+          <div class="nav-item">Records</div>
+          <div class="nav-item">Audit</div>
+        </nav>
+        <section class="workspace">
+          <header class="topbar">
+            <div>
+              <h1>Admin high-fidelity shell</h1>
+              <p>Replace content with the confirmed PRD current step.</p>
+            </div>
+            <div class="command-bar">
+              <button type="button" data-toggle-pins>Hide pins</button>
+              <button type="button" class="primary">Primary action</button>
+            </div>
+          </header>
+          <div class="content">
+            <section class="panel target" data-anno="1">
+              <span class="pin">1</span>
+              <h2>Metric area</h2>
+              <div class="metrics">
+                <div class="metric"><span>Metric A</span><strong>128</strong></div>
+                <div class="metric"><span>Metric B</span><strong>96.8%</strong></div>
+                <div class="metric"><span>Metric C</span><strong>17</strong></div>
+                <div class="metric"><span>Metric D</span><strong>42</strong></div>
+              </div>
+            </section>
+            <section class="panel target" data-anno="2">
+              <span class="pin">2</span>
+              <h2>Filters and table</h2>
+              <div class="filters">
+                <input class="field" aria-label="search" placeholder="Search keyword">
+                <select class="field" aria-label="status"><option>All status</option><option>Success</option><option>Pending</option></select>
+                <button type="button">Search</button>
+              </div>
+              <div class="table">
+                <div class="row"><span>Name</span><span>Status</span><span>Owner</span><span>Updated</span><span>Action</span></div>
+                <div class="row selected"><span>Record A</span><span><span class="tag success">Success</span></span><span>Owner A</span><span>09:42</span><button type="button">Detail</button></div>
+                <div class="row"><span>Record B</span><span><span class="tag warning">Pending</span></span><span>Owner B</span><span>09:36</span><button type="button">Detail</button></div>
+              </div>
+            </section>
+          </div>
+        </section>
+      </div>
+    </section>
+    <aside class="doc-panel" aria-label="documentation">
+      <h1>Documentation</h1>
+      <p>Use this panel to explain product behavior, fields, interactions, changes, and acceptance points.</p>
+      <h2>Annotations</h2>
+      <div class="doc-item" data-anno="1" data-pin="1"><strong>Metric area</strong><br>Explain current-step status and decision signals.</div>
+      <div class="doc-item" data-anno="2" data-pin="2"><strong>Operation area</strong><br>Explain filters, table fields, actions, and states.</div>
+    </aside>
+  </main>
+  <script>
+    const syncActive = (id, on) => {
+      document.querySelectorAll(`[data-anno="${id}"]`).forEach((node) => node.classList.toggle('is-active', on));
+    };
+    document.querySelectorAll('[data-anno]').forEach((node) => {
+      const id = node.getAttribute('data-anno');
+      node.addEventListener('mouseenter', () => syncActive(id, true));
+      node.addEventListener('mouseleave', () => syncActive(id, false));
+      node.addEventListener('focusin', () => syncActive(id, true));
+      node.addEventListener('focusout', () => syncActive(id, false));
+    });
+    document.querySelector('[data-toggle-pins]').addEventListener('click', (event) => {
+      document.body.classList.toggle('hide-pins');
+      event.currentTarget.textContent = document.body.classList.contains('hide-pins') ? 'Show pins' : 'Hide pins';
+    });
+  </script>
+</body>
+</html>

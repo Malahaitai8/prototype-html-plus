@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>C-Side Styled Hi-Fi Demo - Warm Lifestyle Exchange</title>
+  <style>
+    :root {
+      --bg: #f7f8fb;
+      --paper: #fffdf9;
+      --panel: #ffffff;
+      --ink: #263238;
+      --muted: #6f7a83;
+      --line: #e3e8ee;
+      --mint: #2abf88;
+      --mint-soft: #e8f8f1;
+      --coral: #ff7d66;
+      --coral-soft: #fff0ec;
+      --blue: #4f8cff;
+      --violet: #7c6df2;
+      --radius: 18px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: linear-gradient(145deg, #eef6ff 0%, #f7f8fb 44%, #fff7f3 100%); font-size: 14px; line-height: 1.45; }
+    button, input, textarea { font: inherit; }
+    button { min-height: 38px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink); cursor: pointer; padding: 8px 14px; }
+    button.primary { border-color: var(--coral); background: var(--coral); color: #fff; }
+    button.soft { border-color: var(--mint); background: var(--mint-soft); color: #116b4d; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
+    .shell { min-height: 100vh; display: grid; grid-template-columns: minmax(440px, 1fr) 372px; }
+    .prototype { padding: 18px; display: grid; place-items: start center; overflow: auto; }
+    .doc-panel { position: sticky; top: 0; height: 100vh; overflow: auto; border-left: 1px solid var(--line); background: rgba(255,255,255,.92); padding: 18px; }
+    .phone { width: min(390px, 100%); min-height: 800px; border: 1px solid #d8e0e8; border-radius: 32px; background: var(--paper); overflow: hidden; box-shadow: 0 18px 44px rgba(76, 91, 108, .18); display: grid; grid-template-rows: auto auto 1fr auto; }
+    .status { height: 28px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; font-size: 12px; background: rgba(255,255,255,.74); }
+    .nav { min-height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; background: rgba(255,255,255,.78); border-bottom: 1px solid rgba(227,232,238,.7); }
+    .brand { font-weight: 800; letter-spacing: 0; }
+    .screen { min-height: 0; overflow: auto; padding: 14px; display: grid; gap: 12px; align-content: start; }
+    .hero { min-height: 136px; border-radius: 24px; padding: 18px; color: #fff; background:
+      radial-gradient(circle at 82% 18%, rgba(255,255,255,.32), transparent 26%),
+      linear-gradient(135deg, #2abf88, #4f8cff 58%, #7c6df2);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero h1 { margin: 0; font-size: 24px; letter-spacing: 0; max-width: 240px; }
+    .hero p { margin: 8px 0 0; color: rgba(255,255,255,.86); max-width: 270px; }
+    .trust-strip { display: flex; gap: 8px; overflow: auto; padding-bottom: 2px; }
+    .trust-pill { flex: 0 0 auto; min-height: 30px; border-radius: 999px; padding: 6px 10px; background: #fff; color: var(--muted); border: 1px solid var(--line); }
+    .trust-pill strong { color: var(--mint); }
+    .section-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    h1, h2, h3, p { margin: 0; }
+    h2 { font-size: 17px; }
+    h3 { font-size: 15px; }
+    p { color: var(--muted); }
+    .story-card, .doc-item { border: 1px solid var(--line); background: rgba(255,255,255,.92); border-radius: var(--radius); }
+    .story-card { padding: 12px; position: relative; box-shadow: 0 8px 24px rgba(76,91,108,.08); }
+    .item-grid { display: grid; grid-template-columns: 88px 1fr; gap: 12px; }
+    .photo { width: 88px; height: 96px; border-radius: 16px; display: grid; place-items: center; color: #fff; font-size: 24px; font-weight: 800; background: linear-gradient(145deg, #ff9f7b, #7c6df2); }
+    .photo.green { background: linear-gradient(145deg, #2abf88, #4f8cff); }
+    .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .tag { display: inline-flex; align-items: center; min-height: 22px; border-radius: 999px; padding: 0 8px; border: 1px solid var(--line); color: var(--muted); background: #fff; font-size: 12px; }
+    .tag.mint { color: #116b4d; background: var(--mint-soft); border-color: #b7ecd7; }
+    .tag.coral { color: #a23b2b; background: var(--coral-soft); border-color: #ffd1c8; }
+    .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+    .dock { padding: 10px 14px; background: rgba(255,255,255,.9); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .dock button { border: 0; border-radius: 14px; color: var(--muted); background: transparent; }
+    .dock button.active { background: var(--coral-soft); color: var(--coral); font-weight: 700; }
+    .sheet-backdrop { position: fixed; inset: 0; display: none; align-items: end; justify-content: center; background: rgba(20,32,44,.34); z-index: 30; }
+    .sheet-backdrop.open { display: flex; }
+    .sheet { width: min(390px, calc(100vw - 24px)); background: #fff; border-radius: 24px 24px 0 0; padding: 18px; display: grid; gap: 12px; box-shadow: 0 -18px 44px rgba(20,32,44,.18); }
+    .field { min-height: 40px; border: 1px solid var(--line); border-radius: 14px; padding: 9px 12px; background: #fff; }
+    .toast { position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%); display: none; background: rgba(38,50,56,.9); color: #fff; border-radius: 999px; padding: 9px 14px; z-index: 40; }
+    .toast.show { display: block; }
+    .target { position: relative; outline: 0 solid transparent; transition: background .16s ease, outline-color .16s ease; }
+    .target.is-active { outline: 2px solid var(--coral); background: var(--coral-soft); }
+    .pin { position: absolute; top: -10px; right: -10px; z-index: 2; width: 24px; height: 24px; border-radius: 999px; display: grid; place-items: center; background: var(--coral); color: #fff; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--coral); font-size: 12px; font-weight: 700; }
+    body.hide-pins .pin { display: none; }
+    .doc-panel h1 { font-size: 18px; }
+    .doc-panel h2 { margin: 18px 0 8px; font-size: 14px; }
+    .doc-panel p { margin-top: 4px; }
+    .doc-item { padding: 10px 10px 10px 42px; margin: 8px 0; position: relative; }
+    .doc-item::before { content: attr(data-pin); position: absolute; left: 10px; top: 10px; width: 22px; height: 22px; border-radius: 999px; display: grid; place-items: center; background: var(--coral); color: #fff; font-size: 12px; font-weight: 700; }
+    .doc-item.is-active { border-color: var(--coral); background: var(--coral-soft); }
+    .small { font-size: 12px; color: var(--muted); }
+    .hidden { display: none !important; }
+    @media (max-width: 860px) {
+      .shell { display: block; }
+      .prototype { padding: 12px; }
+      .doc-panel { position: static; height: auto; border-left: 0; border-top: 1px solid var(--line); }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="prototype" aria-label="warm lifestyle exchange high fidelity prototype">
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G 100%</span></div>
+        <header class="nav target" data-anno="1">
+          <span class="pin">1</span>
+          <button type="button" data-toggle-pins>隐藏</button>
+          <span class="brand">邻里好物</span>
+          <button type="button" class="soft" data-open-sheet>发布</button>
+        </header>
+        <section class="screen">
+          <section class="hero target" data-anno="2">
+            <span class="pin">2</span>
+            <h1>让闲置继续在小区里发光</h1>
+            <p>温暖生活方式风格，用轻松叙事降低陌生交易压力。</p>
+          </section>
+
+          <div class="trust-strip">
+            <div class="trust-pill"><strong>3期住户</strong> 已认证</div>
+            <div class="trust-pill">只做邻里自提</div>
+            <div class="trust-pill">平台记录沟通，不做担保</div>
+          </div>
+
+          <div class="section-title target" data-anno="3">
+            <span class="pin">3</span>
+            <div>
+              <h2>今日适合交换</h2>
+              <p class="small">按生活场景组织，而不是基础列表堆叠。</p>
+            </div>
+            <button type="button" data-filter-life>亲子</button>
+          </div>
+
+          <article class="story-card target" data-anno="4" data-item="儿童平衡车">
+            <span class="pin">4</span>
+            <div class="item-grid">
+              <div class="photo">车</div>
+              <div>
+                <h3>儿童平衡车</h3>
+                <p>适合 3-5 岁，想换绘本或积木。楼下花园自提，不催促。</p>
+                <div class="meta">
+                  <span class="tag mint">同小区认证</span>
+                  <span class="tag coral">交换优先</span>
+                  <span class="tag">今晚可约</span>
+                </div>
+              </div>
+            </div>
+            <div class="action-row">
+              <button type="button" data-show-detail>看故事</button>
+              <button type="button" class="primary" data-reserve>温和预约</button>
+            </div>
+          </article>
+
+          <article class="story-card" data-item="小米电煮锅">
+            <div class="item-grid">
+              <div class="photo green">锅</div>
+              <div>
+                <h3>小米电煮锅</h3>
+                <p>搬家前低价转让，功能正常，建议当面验货后再取走。</p>
+                <div class="meta">
+                  <span class="tag mint">住户已认证</span>
+                  <span class="tag">门口自提</span>
+                </div>
+              </div>
+            </div>
+            <div class="action-row">
+              <button type="button" data-show-detail>看故事</button>
+              <button type="button" class="primary" data-reserve>预约自提</button>
+            </div>
+          </article>
+
+          <section class="story-card target" data-anno="5">
+            <span class="pin">5</span>
+            <h3>安心交换边界</h3>
+            <p>只记录沟通和取货状态，不承诺平台担保；大额交易会提示线下谨慎。</p>
+            <button type="button" class="soft" data-boundary>查看边界说明</button>
+          </section>
+        </section>
+        <nav class="dock" aria-label="底部导航">
+          <button type="button" class="active">发现</button>
+          <button type="button">预约</button>
+          <button type="button">我的</button>
+        </nav>
+      </div>
+    </section>
+
+    <aside class="doc-panel" aria-label="高保真说明文档">
+      <h1>右侧说明文档</h1>
+      <p>本 demo 来自已确认 UI 风格：温暖生活方式 / 社区友好 / 年轻可信。它保留微信小程序路径，但不只是基础 WeUI 单元格换色。</p>
+      <h2>原型说明</h2>
+      <p class="small">Step A 只覆盖发布闲置、浏览物品、发起预约和查看风险边界。</p>
+      <h2>功能说明</h2>
+      <p class="small">用户通过生活场景发现物品，查看故事感描述，使用低压力预约动作完成交换意向。</p>
+      <h2>字段说明</h2>
+      <p class="small">核心字段包括物品名称、交换类型、认证状态、自提时间、风险边界和预约反馈。</p>
+      <h2>交互说明</h2>
+      <p class="small">支持标注显隐、亲子筛选、故事 toast、温和预约、发布弹层和边界说明。</p>
+      <h2>编号标注</h2>
+      <div class="doc-item" data-anno="1" data-pin="1"><strong>品牌化头部</strong><br>用更轻的品牌名称和发布入口建立生活方式感。</div>
+      <div class="doc-item" data-anno="2" data-pin="2"><strong>生活方式首屏</strong><br>用视觉主张替代基础列表首屏，降低交易压力。</div>
+      <div class="doc-item" data-anno="3" data-pin="3"><strong>场景化分组</strong><br>按生活场景组织信息，而不是只做分类 Tab。</div>
+      <div class="doc-item" data-anno="4" data-pin="4"><strong>故事卡片</strong><br>物品卡强调来源、交换心态和可信标签。</div>
+      <div class="doc-item" data-anno="5" data-pin="5"><strong>风险边界</strong><br>保持平台不担保、不鼓励大额交易的约束。</div>
+      <h2>验收点</h2>
+      <p class="small">用户应感知温暖、可信、社区友好；布局和节奏应不同于基础 WeUI 列表。</p>
+    </aside>
+  </main>
+
+  <div class="sheet-backdrop" data-sheet>
+    <section class="sheet" aria-label="发布闲置弹层">
+      <h2>发布一件好物</h2>
+      <p>用轻松说明让邻居知道它适合谁、怎么取。</p>
+      <input class="field" aria-label="物品名称" value="儿童绘本一套">
+      <textarea class="field" aria-label="物品说明" rows="3">希望交换积木或儿童餐具，只做小区门口自提。</textarea>
+      <div class="action-row">
+        <button type="button" data-close-sheet>稍后</button>
+        <button type="button" class="primary" data-submit-sheet>发布</button>
+      </div>
+    </section>
+  </div>
+  <div class="toast" data-toast>已更新</div>
+
+  <script>
+    const syncActive = (id, on) => {
+      document.querySelectorAll(`[data-anno="${id}"]`).forEach((node) => node.classList.toggle('is-active', on));
+    };
+
+    document.querySelectorAll('[data-anno]').forEach((node) => {
+      const id = node.getAttribute('data-anno');
+      node.addEventListener('mouseenter', () => syncActive(id, true));
+      node.addEventListener('mouseleave', () => syncActive(id, false));
+      node.addEventListener('focusin', () => syncActive(id, true));
+      node.addEventListener('focusout', () => syncActive(id, false));
+    });
+
+    const showToast = (message) => {
+      const toast = document.querySelector('[data-toast]');
+      toast.textContent = message;
+      toast.classList.add('show');
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove('show'), 1800);
+    };
+
+    document.querySelector('[data-toggle-pins]').addEventListener('click', (event) => {
+      document.body.classList.toggle('hide-pins');
+      event.currentTarget.textContent = document.body.classList.contains('hide-pins') ? '显示' : '隐藏';
+    });
+
+    document.querySelector('[data-filter-life]').addEventListener('click', (event) => {
+      event.currentTarget.textContent = event.currentTarget.textContent === '亲子' ? '家用' : '亲子';
+      showToast('已切换生活场景');
+    });
+
+    document.querySelectorAll('[data-show-detail]').forEach((button) => {
+      button.addEventListener('click', () => showToast(`${button.closest('[data-item]').dataset.item}：适合当面沟通后自提`));
+    });
+
+    document.querySelectorAll('[data-reserve]').forEach((button) => {
+      button.addEventListener('click', () => showToast(`已发起${button.closest('[data-item]').dataset.item}预约`));
+    });
+
+    document.querySelector('[data-boundary]').addEventListener('click', () => showToast('平台仅记录和引导，不做担保'));
+    document.querySelector('[data-open-sheet]').addEventListener('click', () => document.querySelector('[data-sheet]').classList.add('open'));
+    document.querySelector('[data-close-sheet]').addEventListener('click', () => document.querySelector('[data-sheet]').classList.remove('open'));
+    document.querySelector('[data-submit-sheet]').addEventListener('click', () => {
+      document.querySelector('[data-sheet]').classList.remove('open');
+      showToast('好物已发布，等待邻居发现');
+    });
+  </script>
+</body>
+</html>

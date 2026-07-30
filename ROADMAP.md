@@ -8,7 +8,7 @@ Goal: build a usable Codex Skill for interactive HTML product prototypes without
 - Step 1: Reference Skill research and decisions.
 - Step 2: Requirement intake and structured questioning.
 - Step 3: Wireframe mode.
-- Step 4: Basic high-fidelity admin mode.
+- Step 4: High-fidelity mode with B-side/C-side demos, style routing, and optional brand assets.
 - Step 5: Side documentation and numbered pin annotations.
 - Step 6: Region screenshot rebuild mode.
 - Step 7: Local preview and verification workflow.

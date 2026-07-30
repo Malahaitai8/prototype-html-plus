@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>B-Side Styled Hi-Fi Demo - Modern SaaS Ops</title>
+  <style>
+    :root { --bg:#f6f7f9; --surface:#fff; --soft:#fbfbfc; --ink:#171717; --muted:#6b7280; --line:#e5e7eb; --accent:#111827; --blue:#2563eb; --green:#059669; --amber:#b7791f; --red:#dc2626; --radius:8px; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45} button,input,select{font:inherit} button{min-height:32px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink);padding:6px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px} button:hover,button.active{border-color:var(--accent);background:#f3f4f6} button.primary{background:var(--accent);border-color:var(--accent);color:#fff} button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-offset:2px} h1,h2,h3,p{margin:0} h1{font-size:22px} h2{font-size:14px} h3{font-size:13px} p{color:var(--muted)}
+    .shell{min-height:100vh;display:grid;grid-template-columns:minmax(980px,1fr) 372px}.prototype{padding:16px;overflow:auto}.doc-panel{position:sticky;top:0;height:100vh;overflow:auto;border-left:1px solid var(--line);background:var(--surface);padding:18px}.app{min-height:calc(100vh - 32px);border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:0 18px 45px rgba(17,24,39,.08);display:grid;grid-template-columns:232px 1fr;overflow:hidden}.sidebar{border-right:1px solid var(--line);background:#fcfcfd;padding:14px;display:grid;grid-template-rows:auto auto 1fr auto;gap:14px}.brand{display:flex;align-items:center;gap:10px;font-weight:700}.logo{width:28px;height:28px;border-radius:7px;background:#111827;color:#fff;display:grid;place-items:center}.icon{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}.nav-list{display:grid;gap:4px}.nav-item{min-height:34px;display:flex;align-items:center;gap:9px;padding:0 9px;border-radius:7px;color:var(--muted)}.nav-item.active{background:#f1f5f9;color:var(--ink);font-weight:650}.workspace{display:grid;grid-template-rows:auto auto 1fr;min-width:0}.topbar,.toolbar{border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:14px}.toolbar{min-height:58px;padding:10px 16px}.filters,.actions,.tabs{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.field{min-height:32px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);padding:6px 10px}.content{display:grid;grid-template-columns:minmax(600px,1fr) 318px;min-height:0}.main-col{min-width:0;padding:16px;overflow:auto}.inspector{border-left:1px solid var(--line);padding:16px;background:var(--soft);overflow:auto}.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}.metric,.panel,.doc-item{border:1px solid var(--line);border-radius:var(--radius);background:#fff}.metric{min-height:84px;padding:12px;display:grid;align-content:space-between}.metric strong{display:block;margin-top:5px;font-size:22px}.trend{color:var(--green);font-size:12px}.panel{position:relative;overflow:hidden}.panel-head{min-height:44px;border-bottom:1px solid var(--line);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px}.row{display:grid;grid-template-columns:1.25fr .8fr .75fr .8fr .7fr;gap:10px;align-items:center;min-height:44px;padding:8px 12px;border-top:1px solid var(--line)}.row:first-child{border-top:0;background:#fafafa;color:var(--muted);font-size:12px;font-weight:700}.row[data-row]{cursor:pointer}.row[data-row]:hover,.row.selected{background:#f8fafc}.tag{display:inline-flex;align-items:center;gap:5px;min-height:22px;border-radius:999px;padding:0 8px;border:1px solid var(--line);background:#fff;color:var(--muted);font-size:12px;white-space:nowrap}.tag.green{color:var(--green);background:#ecfdf5;border-color:#bbf7d0}.tag.warn{color:var(--amber);background:#fffbeb;border-color:#fde68a}.tag.red{color:var(--red);background:#fef2f2;border-color:#fecaca}.mini-chart{height:72px;display:flex;align-items:end;gap:5px;padding-top:10px}.bar{flex:1;border-radius:3px 3px 0 0;background:#dbeafe;min-height:16px}.bar.risk{background:#fecaca}.detail-card{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:12px;display:grid;gap:10px}.timeline{display:grid;gap:8px;margin-top:12px}.event{border-left:2px solid #d1d5db;padding-left:9px;color:var(--muted);font-size:12px}.target{position:relative;outline:0 solid transparent;transition:background .16s ease,outline-color .16s ease}.target.is-active{outline:2px solid var(--blue);background:#eff6ff}.pin{position:absolute;top:-10px;right:-10px;z-index:2;width:24px;height:24px;border-radius:999px;display:grid;place-items:center;background:var(--accent);color:#fff;border:2px solid #fff;box-shadow:0 0 0 1px var(--accent);font-size:12px;font-weight:700}body.hide-pins .pin{display:none}.doc-panel h1{font-size:18px}.doc-panel h2{margin:18px 0 8px;font-size:14px}.doc-panel p{margin-top:4px}.doc-item{padding:10px 10px 10px 42px;margin:8px 0;position:relative}.doc-item:before{content:attr(data-pin);position:absolute;left:10px;top:10px;width:22px;height:22px;border-radius:999px;display:grid;place-items:center;background:var(--accent);color:#fff;font-size:12px;font-weight:700}.doc-item.is-active{border-color:var(--blue);background:#eff6ff}.small{color:var(--muted);font-size:12px}.modal{position:fixed;inset:0;z-index:20;display:none;place-items:center;background:rgba(17,24,39,.28)}.modal.open{display:grid}.modal-card{width:min(420px,calc(100vw - 32px));border-radius:12px;border:1px solid var(--line);background:#fff;box-shadow:0 22px 60px rgba(17,24,39,.18);padding:18px;display:grid;gap:12px}.hidden{display:none!important}
+    @media(max-width:1180px){.shell{display:block}.doc-panel{position:static;height:auto;border-left:0;border-top:1px solid var(--line)}} @media(max-width:920px){.app{grid-template-columns:1fr}.content{grid-template-columns:1fr}.inspector{border-left:0;border-top:1px solid var(--line)}.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.row{grid-template-columns:1fr .8fr .8fr}.row span:nth-child(4),.row span:nth-child(5){display:none}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="prototype" aria-label="modern SaaS operations high fidelity prototype">
+      <div class="app">
+        <aside class="sidebar target" data-anno="1">
+          <span class="pin">1</span>
+          <div class="brand"><span class="logo"><svg class="icon" viewBox="0 0 24 24"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></span><span>RelayOps</span></div>
+          <div class="nav-list">
+            <div class="nav-item active"><svg class="icon" viewBox="0 0 24 24"><path d="M4 13h6V4H4z"/><path d="M14 20h6V4h-6z"/></svg>会话队列</div>
+            <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12h18"/><path d="m15 6 6 6-6 6"/></svg>分配策略</div>
+            <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>质量分析</div>
+            <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 15a2 2 0 0 0 .4 2"/></svg>设置</div>
+          </div>
+          <p class="small">Styled route: Linear/Vercel-like SaaS. Brand asset route: restrained logo mark only.</p>
+        </aside>
+        <section class="workspace">
+          <header class="topbar target" data-anno="2">
+            <span class="pin">2</span>
+            <div><h1>AI 运营控制台</h1><p>监控多渠道客服会话、识别高风险工单，并分配人工跟进。</p></div>
+            <div class="actions">
+              <button type="button" data-toggle-pins><svg class="icon" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 10.6A2 2 0 0 0 13.4 13.4"/></svg>隐藏标注</button>
+              <button type="button" class="primary" data-open-modal><svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>新建分配</button>
+            </div>
+          </header>
+          <div class="toolbar target" data-anno="3">
+            <span class="pin">3</span>
+            <div class="filters"><input class="field" data-search placeholder="搜索会话、用户或工单" aria-label="搜索"><select class="field" data-risk-filter aria-label="风险筛选"><option value="all">全部风险</option><option value="high">高风险</option><option value="pending">待跟进</option></select></div>
+            <div class="tabs"><button type="button" class="active" data-channel="all">全部</button><button type="button" data-channel="wechat">微信</button><button type="button" data-channel="web">网页</button></div>
+          </div>
+          <section class="content">
+            <div class="main-col">
+              <section class="summary target" data-anno="4">
+                <span class="pin">4</span>
+                <article class="metric"><span class="small">实时会话</span><strong>1,284</strong><span class="trend">+12% 今日</span></article>
+                <article class="metric"><span class="small">高风险工单</span><strong data-risk-count>47</strong><span class="tag red">需人工</span></article>
+                <article class="metric"><span class="small">平均响应</span><strong>42s</strong><span class="trend">优于目标</span></article>
+                <article class="metric"><span class="small">自动解决率</span><strong>68%</strong><div class="mini-chart"><i class="bar" style="height:34px"></i><i class="bar" style="height:44px"></i><i class="bar risk" style="height:26px"></i><i class="bar" style="height:55px"></i></div></article>
+              </section>
+              <section class="panel target" data-anno="5">
+                <span class="pin">5</span>
+                <div class="panel-head"><h2>会话风险队列</h2><span class="small" data-filter-note>显示全部会话</span></div>
+                <div>
+                  <div class="row"><span>会话</span><span>渠道</span><span>风险</span><span>负责人</span><span>状态</span></div>
+                  <div class="row selected" data-row data-risk="high" data-channel-value="wechat" data-title="退款争议 #A-2049" data-owner="周南" data-status="等待人工确认"><span>退款争议 #A-2049</span><span>微信</span><span><span class="tag red">高风险</span></span><span>周南</span><span>待跟进</span></div>
+                  <div class="row" data-row data-risk="pending" data-channel-value="web" data-title="物流延迟 #W-1182" data-owner="林晨" data-status="AI 已建议补偿"><span>物流延迟 #W-1182</span><span>网页</span><span><span class="tag warn">待跟进</span></span><span>林晨</span><span>处理中</span></div>
+                  <div class="row" data-row data-risk="low" data-channel-value="wechat" data-title="修改地址 #A-2207" data-owner="自动处理" data-status="已解决"><span>修改地址 #A-2207</span><span>微信</span><span><span class="tag green">低风险</span></span><span>自动处理</span><span>完成</span></div>
+                </div>
+              </section>
+            </div>
+            <aside class="inspector target" data-anno="6">
+              <span class="pin">6</span>
+              <div class="detail-card">
+                <div><h2 data-detail-title>退款争议 #A-2049</h2><p data-detail-status>等待人工确认</p></div>
+                <div><span class="small">建议负责人</span><h3 data-detail-owner>周南</h3></div>
+                <button type="button" class="primary" data-assign><svg class="icon" viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="m21 3-7 7"/><path d="M5 21l6-6"/></svg>分配给人工</button>
+                <div class="timeline"><div class="event">09:42 AI 标记退款争议情绪升级</div><div class="event">09:44 已汇总订单、物流和历史对话</div><div class="event">09:45 等待人工确认处理口径</div></div>
+              </div>
+            </aside>
+          </section>
+        </section>
+      </div>
+    </section>
+    <aside class="doc-panel" aria-label="高保真说明文档">
+      <h1>右侧说明文档</h1><p>本 demo 使用 Linear/Vercel 式现代 SaaS 路线：克制灰阶、强留白、细边框、真实工作台和一致线性图标。未使用 emoji 或强吉祥物。</p>
+      <h2>原型说明</h2><p class="small">Step A 只覆盖会话监控、风险筛选、队列选中、人工分配和分配确认。</p>
+      <h2>参考与资产</h2><p class="small">官方主参考 Ant Design 的后台工作流；现代辅参考 shadcn/ui 的克制表面与 Radix/Headless 的交互语义；图标为自绘内联 SVG 线性风格。</p>
+      <h2>交互说明</h2><p class="small">支持标注显隐、渠道切换、风险筛选、行选择、人工分配和确认弹窗。</p>
+      <h2>编号标注</h2>
+      <div class="doc-item" data-anno="1" data-pin="1"><strong>品牌与导航</strong><br>克制 logo mark 与线性导航图标，适合 B 端 SaaS。</div>
+      <div class="doc-item" data-anno="2" data-pin="2"><strong>工作台头部</strong><br>说明当前 Step A 的运营目标和主命令。</div>
+      <div class="doc-item" data-anno="3" data-pin="3"><strong>筛选工具条</strong><br>承载搜索、风险筛选和渠道切换。</div>
+      <div class="doc-item" data-anno="4" data-pin="4"><strong>核心指标</strong><br>指标密度服务运营判断，而不是卡片拼贴。</div>
+      <div class="doc-item" data-anno="5" data-pin="5"><strong>风险队列</strong><br>真实表格队列支持比较和选择。</div>
+      <div class="doc-item" data-anno="6" data-pin="6"><strong>详情检查器</strong><br>右侧 inspector 展示选中会话和人工动作。</div>
+      <h2>验收点</h2><p class="small">页面应像现代 SaaS 工作台，而不是暗色炫光 dashboard；图标、logo、表格和详情联动要保持一致。</p>
+    </aside>
+  </main>
+  <div class="modal" data-modal role="dialog" aria-modal="true" aria-label="分配确认"><section class="modal-card"><h2>确认分配当前会话？</h2><p data-modal-copy>将退款争议 #A-2049 分配给周南，并保留 AI 摘要。</p><div class="actions"><button type="button" data-close-modal>取消</button><button type="button" class="primary" data-confirm-assign>确认分配</button></div></section></div>
+  <script>
+    const syncActive=(id,on)=>document.querySelectorAll(`[data-anno="${id}"]`).forEach((node)=>node.classList.toggle('is-active',on));
+    document.querySelectorAll('[data-anno]').forEach((node)=>{const id=node.getAttribute('data-anno');node.addEventListener('mouseenter',()=>syncActive(id,true));node.addEventListener('mouseleave',()=>syncActive(id,false));node.addEventListener('focusin',()=>syncActive(id,true));node.addEventListener('focusout',()=>syncActive(id,false));});
+    document.querySelector('[data-toggle-pins]').addEventListener('click',(event)=>{document.body.classList.toggle('hide-pins');event.currentTarget.lastChild.textContent=document.body.classList.contains('hide-pins')?'显示标注':'隐藏标注';});
+    const applyFilters=()=>{const risk=document.querySelector('[data-risk-filter]').value;const channel=document.querySelector('[data-channel].active').dataset.channel;document.querySelectorAll('[data-row]').forEach((row)=>{const hideByRisk=risk!=='all'&&row.dataset.risk!==risk;const hideByChannel=channel!=='all'&&row.dataset.channelValue!==channel;row.classList.toggle('hidden',hideByRisk||hideByChannel);});document.querySelector('[data-filter-note]').textContent=risk==='all'?'显示全部会话':`筛选：${risk==='high'?'高风险':'待跟进'}`;};
+    document.querySelector('[data-risk-filter]').addEventListener('change',applyFilters);
+    document.querySelectorAll('[data-channel]').forEach((button)=>button.addEventListener('click',()=>{document.querySelectorAll('[data-channel]').forEach((item)=>item.classList.toggle('active',item===button));applyFilters();}));
+    document.querySelectorAll('[data-row]').forEach((row)=>row.addEventListener('click',()=>{document.querySelectorAll('[data-row]').forEach((item)=>item.classList.remove('selected'));row.classList.add('selected');document.querySelector('[data-detail-title]').textContent=row.dataset.title;document.querySelector('[data-detail-owner]').textContent=row.dataset.owner;document.querySelector('[data-detail-status]').textContent=row.dataset.status;document.querySelector('[data-modal-copy]').textContent=`将 ${row.dataset.title} 分配给 ${row.dataset.owner}，并保留 AI 摘要。`; }));
+    document.querySelector('[data-open-modal]').addEventListener('click',()=>document.querySelector('[data-modal]').classList.add('open'));
+    document.querySelector('[data-assign]').addEventListener('click',()=>document.querySelector('[data-modal]').classList.add('open'));
+    document.querySelector('[data-close-modal]').addEventListener('click',()=>document.querySelector('[data-modal]').classList.remove('open'));
+    document.querySelector('[data-confirm-assign]').addEventListener('click',()=>{document.querySelector('[data-modal]').classList.remove('open');document.querySelector('[data-risk-count]').textContent='46';document.querySelector('[data-detail-status]').textContent='已分配人工，等待处理';});
+  </script>
+</body>
+</html>

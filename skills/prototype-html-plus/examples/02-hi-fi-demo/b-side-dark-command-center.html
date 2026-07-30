@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>B-Side Styled Hi-Fi Demo - Dark Command Center</title>
+  <style>
+    :root {
+      --bg: #08111f;
+      --panel: #101b2d;
+      --panel-2: #13243a;
+      --ink: #e6edf7;
+      --muted: #8da2bd;
+      --line: #22334c;
+      --line-bright: #2c4d72;
+      --cyan: #29d3ff;
+      --cyan-soft: rgba(41, 211, 255, .14);
+      --blue: #3b82f6;
+      --green: #3ddc97;
+      --amber: #ffb020;
+      --red: #ff5c7a;
+      --radius: 8px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: radial-gradient(circle at 20% 0%, #102844 0, #08111f 34%, #050a13 100%); color: var(--ink); font-size: 14px; line-height: 1.45; }
+    button, input, select { font: inherit; }
+    button { min-height: 32px; border: 1px solid var(--line-bright); border-radius: var(--radius); background: #0d1727; color: var(--ink); padding: 6px 12px; cursor: pointer; }
+    button:hover, button.active { border-color: var(--cyan); color: #fff; background: var(--cyan-soft); }
+    button.primary { background: linear-gradient(135deg, #0f62fe, #15b8ff); border-color: #4cc9ff; color: #fff; }
+    button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+    .shell { min-height: 100vh; display: grid; grid-template-columns: minmax(980px, 1fr) 372px; }
+    .prototype { padding: 16px; overflow: auto; }
+    .doc-panel { position: sticky; top: 0; height: 100vh; overflow: auto; border-left: 1px solid var(--line); background: #0b1320; padding: 18px; }
+    .console { min-height: calc(100vh - 32px); border: 1px solid var(--line-bright); border-radius: 12px; background: rgba(8, 17, 31, .92); box-shadow: 0 24px 60px rgba(0,0,0,.38); display: grid; grid-template-rows: auto 1fr; overflow: hidden; }
+    .command-head { min-height: 72px; border-bottom: 1px solid var(--line); background: linear-gradient(90deg, rgba(15,98,254,.2), rgba(16,27,45,.7)); display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 18px; }
+    .eyebrow { color: var(--cyan); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 22px; letter-spacing: 0; }
+    h2 { font-size: 15px; letter-spacing: 0; }
+    h3 { font-size: 14px; }
+    p { color: var(--muted); }
+    .head-actions, .filters, .action-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .grid { padding: 14px; display: grid; grid-template-columns: 1.1fr 1.6fr .95fr; grid-template-rows: auto minmax(280px, 1fr) auto; gap: 12px; }
+    .panel, .doc-item { border: 1px solid var(--line); border-radius: var(--radius); background: rgba(16, 27, 45, .86); }
+    .panel { padding: 12px; position: relative; min-width: 0; }
+    .panel-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 10px; }
+    .metric-stack { display: grid; gap: 8px; }
+    .metric { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; min-height: 66px; padding: 10px; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(135deg, rgba(41,211,255,.08), rgba(19,36,58,.84)); }
+    .metric strong { display: block; margin-top: 4px; font-size: 23px; color: #fff; }
+    .ring { width: 42px; height: 42px; border-radius: 999px; display: grid; place-items: center; border: 3px solid var(--cyan); box-shadow: 0 0 18px rgba(41,211,255,.28); font-size: 12px; color: var(--cyan); }
+    .map { min-height: 360px; background:
+      linear-gradient(90deg, rgba(41,211,255,.08) 1px, transparent 1px),
+      linear-gradient(rgba(41,211,255,.08) 1px, transparent 1px),
+      radial-gradient(circle at 50% 50%, rgba(15,98,254,.2), transparent 48%);
+      background-size: 42px 42px, 42px 42px, cover;
+      border: 1px solid var(--line-bright);
+      border-radius: var(--radius);
+      position: relative;
+      overflow: hidden;
+    }
+    .node { position: absolute; width: 12px; height: 12px; border-radius: 999px; background: var(--green); box-shadow: 0 0 0 6px rgba(61,220,151,.12), 0 0 22px rgba(61,220,151,.52); }
+    .node.warn { background: var(--amber); box-shadow: 0 0 0 6px rgba(255,176,32,.14), 0 0 22px rgba(255,176,32,.5); }
+    .node.danger { background: var(--red); box-shadow: 0 0 0 6px rgba(255,92,122,.14), 0 0 22px rgba(255,92,122,.56); }
+    .n1 { left: 18%; top: 34%; } .n2 { left: 48%; top: 22%; } .n3 { left: 64%; top: 55%; } .n4 { left: 78%; top: 38%; } .n5 { left: 33%; top: 66%; }
+    .map-label { position: absolute; left: 14px; bottom: 14px; right: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .map-stat { border: 1px solid var(--line); background: rgba(8,17,31,.78); border-radius: var(--radius); padding: 8px; }
+    .stream { display: grid; gap: 8px; }
+    .event { border-left: 3px solid var(--cyan); background: rgba(8,17,31,.52); padding: 9px 10px; border-radius: 0 var(--radius) var(--radius) 0; }
+    .event.warn { border-color: var(--amber); }
+    .event.danger { border-color: var(--red); }
+    .tag { display: inline-flex; align-items: center; min-height: 22px; border-radius: 999px; padding: 0 8px; border: 1px solid var(--line-bright); color: var(--muted); font-size: 12px; }
+    .tag.green { color: var(--green); border-color: rgba(61,220,151,.5); background: rgba(61,220,151,.08); }
+    .tag.warn { color: var(--amber); border-color: rgba(255,176,32,.5); background: rgba(255,176,32,.08); }
+    .tag.danger { color: var(--red); border-color: rgba(255,92,122,.5); background: rgba(255,92,122,.08); }
+    .table { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    .row { display: grid; grid-template-columns: 1.2fr .8fr .7fr .7fr; gap: 8px; align-items: center; min-height: 40px; padding: 8px 10px; border-top: 1px solid var(--line); }
+    .row:first-child { border-top: 0; color: var(--muted); background: rgba(255,255,255,.04); font-weight: 700; }
+    .row.selected { background: var(--cyan-soft); }
+    .field { min-height: 32px; border: 1px solid var(--line-bright); border-radius: var(--radius); background: #08111f; color: var(--ink); padding: 6px 10px; }
+    .target { position: relative; outline: 0 solid transparent; transition: background .16s ease, outline-color .16s ease; }
+    .target.is-active { outline: 2px solid var(--cyan); background: rgba(41,211,255,.13); }
+    .pin { position: absolute; top: -10px; right: -10px; z-index: 2; width: 24px; height: 24px; border-radius: 999px; display: grid; place-items: center; background: var(--cyan); color: #03101d; border: 2px solid #08111f; box-shadow: 0 0 0 1px var(--cyan), 0 0 18px rgba(41,211,255,.46); font-size: 12px; font-weight: 700; }
+    body.hide-pins .pin { display: none; }
+    .doc-panel h1 { font-size: 18px; }
+    .doc-panel h2 { margin: 18px 0 8px; font-size: 14px; color: #fff; }
+    .doc-panel p { margin-top: 4px; }
+    .doc-item { padding: 10px 10px 10px 42px; margin: 8px 0; position: relative; }
+    .doc-item::before { content: attr(data-pin); position: absolute; left: 10px; top: 10px; width: 22px; height: 22px; border-radius: 999px; display: grid; place-items: center; background: var(--cyan); color: #03101d; font-size: 12px; font-weight: 700; }
+    .doc-item.is-active { border-color: var(--cyan); background: var(--cyan-soft); }
+    .small { color: var(--muted); font-size: 12px; }
+    .hidden { display: none !important; }
+    @media (max-width: 1120px) {
+      .shell { display: block; }
+      .doc-panel { position: static; height: auto; border-left: 0; border-top: 1px solid var(--line); }
+      .grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="prototype" aria-label="dark command center high fidelity prototype">
+      <div class="console">
+        <header class="command-head target" data-anno="1">
+          <span class="pin">1</span>
+          <div>
+            <div class="eyebrow">Styled route: dark command center</div>
+            <h1>全球摄像头同步指挥台</h1>
+            <p>深色高密度监控视图，用于运营人员在异常压力下快速定位和处理。</p>
+          </div>
+          <div class="head-actions">
+            <button type="button" data-toggle-pins>隐藏标注</button>
+            <button type="button" data-mode="normal" class="active">全局</button>
+            <button type="button" data-mode="danger">异常优先</button>
+            <button type="button" class="primary" data-ack>确认当前异常</button>
+          </div>
+        </header>
+
+        <section class="grid">
+          <aside class="panel target" data-anno="2">
+            <span class="pin">2</span>
+            <div class="panel-head">
+              <h2>同步生命体征</h2>
+              <span class="tag green" data-health>健康</span>
+            </div>
+            <div class="metric-stack">
+              <article class="metric"><div><span class="small">在线摄像头</span><strong>24,812</strong></div><div class="ring">98%</div></article>
+              <article class="metric"><div><span class="small">同步延迟 P95</span><strong>1.7s</strong></div><div class="ring">P95</div></article>
+              <article class="metric"><div><span class="small">待确认异常</span><strong data-alert-count>17</strong></div><div class="ring">ALR</div></article>
+            </div>
+          </aside>
+
+          <section class="panel target" data-anno="3">
+            <span class="pin">3</span>
+            <div class="panel-head">
+              <div>
+                <h2>节点态势图</h2>
+                <p class="small">用空间关系和发光状态表达异常分布，而不是传统白底表格。</p>
+              </div>
+              <div class="filters">
+                <select class="field" aria-label="区域选择" data-region>
+                  <option value="global">全球</option>
+                  <option value="apac">亚太</option>
+                  <option value="eu">欧洲</option>
+                </select>
+                <button type="button" data-apply-region>刷新视图</button>
+              </div>
+            </div>
+            <div class="map">
+              <span class="node n1"></span>
+              <span class="node warn n2"></span>
+              <span class="node danger n3"></span>
+              <span class="node n4"></span>
+              <span class="node warn n5"></span>
+              <div class="map-label">
+                <div class="map-stat"><span class="small">活跃区域</span><br><strong data-region-label>全球 9 区</strong></div>
+                <div class="map-stat"><span class="small">异常热区</span><br><strong>北美 / 欧洲</strong></div>
+                <div class="map-stat"><span class="small">刷新频率</span><br><strong>10 秒</strong></div>
+              </div>
+            </div>
+          </section>
+
+          <aside class="panel target" data-anno="4">
+            <span class="pin">4</span>
+            <div class="panel-head">
+              <h2>告警流</h2>
+              <span class="tag warn" data-alert-state>待处理</span>
+            </div>
+            <div class="stream">
+              <div class="event danger"><strong>北美节点超时</strong><p class="small">GL-02482 心跳丢失 8 分钟</p></div>
+              <div class="event warn"><strong>欧洲批次待确认</strong><p class="small">Batch-7782 坐标校准需复核</p></div>
+              <div class="event"><strong>亚太新增完成</strong><p class="small">Camera-AP-1048 校验通过</p></div>
+            </div>
+          </aside>
+
+          <section class="panel target" data-anno="5" style="grid-column: 1 / -1;">
+            <span class="pin">5</span>
+            <div class="panel-head">
+              <h2>异常处理队列</h2>
+              <span class="small">点击行会更新选中态；异常优先模式会隐藏正常记录。</span>
+            </div>
+            <div class="table">
+              <div class="row"><span>对象</span><span>区域</span><span>级别</span><span>操作</span></div>
+              <div class="row selected" data-row data-level="danger"><span>GL-02482</span><span>欧洲</span><span><span class="tag danger">严重</span></span><button type="button" data-select-row>锁定</button></div>
+              <div class="row" data-row data-level="warn"><span>Batch-7782</span><span>欧洲</span><span><span class="tag warn">关注</span></span><button type="button" data-select-row>锁定</button></div>
+              <div class="row" data-row data-level="normal"><span>Camera-AP-1048</span><span>亚太</span><span><span class="tag green">恢复</span></span><button type="button" data-select-row>锁定</button></div>
+            </div>
+          </section>
+        </section>
+      </div>
+    </section>
+
+    <aside class="doc-panel" aria-label="高保真说明文档">
+      <h1>右侧说明文档</h1>
+      <p>本 demo 来自已确认 UI 风格：暗色数据指挥中心。它不是基础后台换色，而是改变了信息节奏、空间组织、状态表达和监控材质。</p>
+      <h2>原型说明</h2>
+      <p class="small">Step A 仍只做同步健康度、节点态势、告警流和异常处理队列，不扩展到规则配置或审计。</p>
+      <h2>功能说明</h2>
+      <p class="small">运营人员可切换异常优先、筛选区域、锁定异常行，并确认当前异常状态。</p>
+      <h2>字段说明</h2>
+      <p class="small">核心字段包括在线摄像头、延迟、异常数、区域、告警级别、心跳状态和刷新频率。</p>
+      <h2>交互说明</h2>
+      <p class="small">支持标注显隐、全局/异常优先模式、区域刷新、队列选中和异常确认。</p>
+      <h2>编号标注</h2>
+      <div class="doc-item" data-anno="1" data-pin="1"><strong>指挥头部</strong><br>显示风格路线、当前任务和高优先级命令。</div>
+      <div class="doc-item" data-anno="2" data-pin="2"><strong>生命体征</strong><br>高密度指标用于快速判断同步健康度。</div>
+      <div class="doc-item" data-anno="3" data-pin="3"><strong>态势图</strong><br>用发光节点表达区域分布和异常热区。</div>
+      <div class="doc-item" data-anno="4" data-pin="4"><strong>告警流</strong><br>按紧急程度展示最近事件，避免只看静态卡片。</div>
+      <div class="doc-item" data-anno="5" data-pin="5"><strong>处理队列</strong><br>承载异常优先筛选和行级锁定动作。</div>
+      <h2>验收点</h2>
+      <p class="small">用户应能感知这是暗色指挥中心风格；布局、状态和材质应明显不同于白底基础后台。</p>
+    </aside>
+  </main>
+
+  <script>
+    const syncActive = (id, on) => {
+      document.querySelectorAll(`[data-anno="${id}"]`).forEach((node) => node.classList.toggle('is-active', on));
+    };
+
+    document.querySelectorAll('[data-anno]').forEach((node) => {
+      const id = node.getAttribute('data-anno');
+      node.addEventListener('mouseenter', () => syncActive(id, true));
+      node.addEventListener('mouseleave', () => syncActive(id, false));
+      node.addEventListener('focusin', () => syncActive(id, true));
+      node.addEventListener('focusout', () => syncActive(id, false));
+    });
+
+    document.querySelector('[data-toggle-pins]').addEventListener('click', (event) => {
+      document.body.classList.toggle('hide-pins');
+      event.currentTarget.textContent = document.body.classList.contains('hide-pins') ? '显示标注' : '隐藏标注';
+    });
+
+    document.querySelectorAll('[data-mode]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-mode]').forEach((item) => item.classList.toggle('active', item === button));
+        const dangerOnly = button.dataset.mode === 'danger';
+        document.querySelectorAll('[data-row]').forEach((row) => row.classList.toggle('hidden', dangerOnly && row.dataset.level === 'normal'));
+      });
+    });
+
+    document.querySelector('[data-apply-region]').addEventListener('click', () => {
+      const value = document.querySelector('[data-region]').value;
+      const label = value === 'global' ? '全球 9 区' : value === 'apac' ? '亚太 3 区' : '欧洲 2 区';
+      document.querySelector('[data-region-label]').textContent = label;
+    });
+
+    document.querySelectorAll('[data-select-row]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.row.selected').forEach((row) => row.classList.remove('selected'));
+        button.closest('.row').classList.add('selected');
+      });
+    });
+
+    document.querySelector('[data-ack]').addEventListener('click', () => {
+      document.querySelector('[data-alert-count]').textContent = '16';
+      document.querySelector('[data-alert-state]').textContent = '已确认 1 条';
+      document.querySelector('[data-alert-state]').classList.remove('warn');
+      document.querySelector('[data-alert-state]').classList.add('green');
+      document.querySelector('[data-health]').textContent = '观察中';
+    });
+  </script>
+</body>
+</html>

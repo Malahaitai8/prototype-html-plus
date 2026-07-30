@@ -258,3 +258,176 @@
 
 ### Git 提交
 - 待用户确认后提交。
+
+## 2026-06-26 22:18 - Step 4 UI Style Confirmation Enhancement
+
+### 本次完成
+- 根据用户反馈调整高保真默认流程：只要用户选择高保真，就必须先输出 UI 风格确认单，确认后才生成 HTML。
+- 更新 `built-in-skills/hi-fi.md`，新增 mandatory UI style confirmation、`basic-hifi` / `styled-hifi` 路由、四类动态确认单：B 端、C 端移动、大屏 / 监控、营销 / 展示。
+- 更新 `built-in-skills/frontend-quality.md`，增加风格确认后的质量检查：风格化不能只换主色，必须改变布局、空间、材质、节奏、状态表达，同时不能牺牲可用性和标注文档。
+- 更新 `SKILL.md`，明确高保真请求必须先确认 UI 风格。
+- 更新 `test-prompts/04-hi-fi-test.md`，加入风格确认单测试和两个风格化高保真场景。
+- 新增两个风格化 demo：
+  - `examples/02-hi-fi-demo/b-side-dark-command-center.html`
+  - `examples/02-hi-fi-demo/c-side-warm-lifestyle-exchange.html`
+- 保留原有两个基础款 demo，作为风格确认单里“简约基础款 / 规范交付版”的参考路线。
+- 更新 `DECISIONS.md` 和 `docs/v1-implementation-plan.md`，记录 UI 风格确认是 Step 4 的强制闸门。
+
+### 当前效果
+- 高保真不再允许“确认 PRD 后直接生成 HTML”；必须先确认 UI 风格。
+- 基础款、深色指挥中心、温暖生活方式成为 Step 4 初始风格参考，后续可继续扩展风格库。
+- B 端风格化 demo 改为深色数据指挥中心，强调高密度监控、态势图、告警流和异常处理队列。
+- C 端风格化 demo 改为温暖生活方式社区交换，强调生活场景、品牌化头部、故事卡片、温和预约和风险边界。
+
+### 测试方式
+- 先执行 RED 探针，确认强制 UI 风格确认规则和两个风格化 demo 在修改前缺失。
+- GREEN 后检查 `hi-fi.md` 是否包含强制 UI 风格确认、四类动态确认单、`basic-hifi` / `styled-hifi` 路由。
+- 检查四个 demo 是否都存在，且风格化 demo 包含右侧说明文档、编号标注、标注显隐、双向 hover / focus 和至少两个交互。
+- 检查风格化 demo 无外部 CDN / 远程资源依赖。
+- 执行 HTML 内联脚本语法检查、临时 HTTP 预览探针和 `git diff --check`。
+
+### 测试结果
+- RED 探针按预期失败，确认强制 UI 风格确认规则和两个风格化 demo 在修改前缺失。
+- GREEN 探针通过，确认 `hi-fi.md` 已包含强制 UI 风格确认、四类动态确认单和两个风格化 demo 文件。
+- 综合静态检查通过，确认风格路由关键词、质量检查、四个 demo 的标注机制、交互钩子、无外部依赖和内联脚本语法均通过。
+- 临时 HTTP 预览探针通过，四个 demo 均返回 200，并在响应中包含右侧说明文档结构。
+
+### 遇到的问题 / 瓶颈
+- 无新的阻塞问题；继续沿用 PowerShell 静态检查 + 临时 Node 脚本验证方式，避免 `node -e` 多层引号不稳定。
+
+### 暂未解决
+- 暂未建立完整风格库；本次只先沉淀基础款、深色指挥中心、温暖生活方式三个初始参考方向。
+
+### 下一步目标
+- 验证 Step 4 UI 风格确认增强后，根据用户验收决定是否继续泛化更多风格示例。
+
+### Git 提交
+- 待用户确认后提交。
+
+## 2026-06-26 21:56 - Step 4 Basic High-Fidelity Mode
+
+### 本次完成
+- 新增 `built-in-skills/hi-fi.md`，定义 Basic High-Fidelity Mode 的输入边界、官方参考声明、场景路由、当前步骤约束和交付闸门。
+- 新增 `built-in-skills/frontend-quality.md`，沉淀高保真前端质量检查：参考贴合、真实产品表面、状态完整性、交互、视觉、响应式和可访问性。
+- 新增两个 starter shell：`starter-components/hi-fi-admin-shell.html` 和 `starter-components/hi-fi-mobile-shell.html`。
+- 新增两个完整高保真 demo：`examples/02-hi-fi-demo/b-side-operations-console.html` 和 `examples/02-hi-fi-demo/c-side-community-exchange-wechat.html`。
+- 更新 `SKILL.md`，将已确认需求后的高保真请求路由到 `hi-fi.md`，并明确截图重建属于 Step 6。
+- 新增 `test-prompts/04-hi-fi-test.md`，覆盖 B 端 Ant Design + Carbon 和 C 端 WeUI 两个高保真场景。
+- 更新 `DECISIONS.md`、`ROADMAP.md`、`README.md` 和 `docs/v1-implementation-plan.md`，同步 Step 4 不再只是后台 admin，而是 B/C 双 demo 的基础高保真模式。
+
+### 当前效果
+- 高保真生成前必须声明产品类型、平台、当前 PRD 步骤、选用官方参考、选用原因和不使用的参考。
+- Step 4 支持从确认 PRD 直接生成高保真，也支持从已确认线框升级到高保真。
+- B 端 demo 主参考 Ant Design，辅参考 Carbon；用于后台布局、筛选、表格、状态、抽屉、弹窗、指标密度和监控层级。
+- C 端 demo 主参考 WeUI；用于微信小程序导航、可信身份提示、物品列表单元、底部主操作、发布弹层和 toast 反馈。
+- Step 4 明确不做截图局部重建或完整截图复刻。
+
+### 测试方式
+- 执行 Step 4 文件存在性探针。
+- 检查 `hi-fi.md` 是否包含内部 Skill、官方参考源、参考声明规则和 Step 6 边界。
+- 检查两个 demo 是否无外部 CDN / 远程资源依赖。
+- 检查两个 demo 是否包含右侧说明文档、编号圆点标注、标注显隐、双向 hover / focus 高亮和至少两个真实交互。
+- 检查 B 端 demo 是否体现 Ant Design + Carbon 的官方参考路线。
+- 检查 C 端 demo 是否体现 WeUI / 微信小程序路线，而不是后台缩小版。
+- 执行 HTML 内联脚本语法检查。
+- 执行 `git diff --check`。
+
+### 测试结果
+- Step 4 文件存在性探针通过，确认 `hi-fi.md`、`frontend-quality.md`、双 demo 和 `04-hi-fi-test.md` 均已创建。
+- 静态 Step 4 检查通过，确认官方参考关键词、Step 6 边界、标注机制、右侧说明文档、关键交互钩子和 HTML 内联脚本语法均通过。
+- `git diff --check` 通过；仅出现 Windows 行尾转换提示，无空白错误。
+
+### 遇到的问题 / 瓶颈
+- `node -e` 在当前 PowerShell 环境下多层引号传递不稳定；已改用 PowerShell 原生静态检查，并将内联脚本临时写入系统临时目录用 `node --check` 验证。
+
+### 暂未解决
+- Step 5 annotation-doc 独立能力尚未开始；当前 Step 4 demo 内仍内置说明文档和编号标注机制。
+- Step 6 screenshot rebuild 尚未开始；截图相关请求仅在 Step 4 中明确边界。
+
+### 下一步目标
+- 验证 Step 4 产物后，根据用户验收决定是否提交 / 推送。
+- 进入 Step 5 前，先确认侧边文档和编号标注是否要抽成独立 starter 组件与脚本。
+
+### Git 提交
+- 待用户确认后提交。
+
+## 2026-06-26 23:18 - Step 4 Style System And Brand Asset Enhancement
+
+### 本次完成
+- 根据用户反馈，将 Step 4 高保真拆成两个可独立路由、最终合并的子能力：风格系统与品牌资产。
+- 新增 `skills/prototype-html-plus/built-in-skills/visual-reference-library.md`，记录官方设计系统、高热度现代 UI、图标体系和品牌资产参考边界。
+- 更新 `SKILL.md`，写入“新步骤 / 新子功能 / 范围重定义前至少两轮问题，每轮不少于两个问题”的协作门禁。
+- 更新 `built-in-skills/requirement-intake.md`，在 PRD Lite 里增加高保真视觉与品牌资产需求入口。
+- 更新 `built-in-skills/hi-fi.md`，增加 UI 风格、视觉参考、配图策略、图标策略、品牌资产确认单和品牌资产生成边界。
+- 更新 `built-in-skills/frontend-quality.md`，增加配图、图标、logo、品牌形象和禁止默认 emoji 图标的质量检查。
+- 新增两个增强版风格 demo：
+  - `examples/02-hi-fi-demo/b-side-modern-saas-ops.html`
+  - `examples/02-hi-fi-demo/c-side-branded-lifestyle-exchange.html`
+- 将 `test-prompts/04-hi-fi-test.md` 收敛为用户要求的两句真实测试提示词。
+
+### 当前效果
+- 高保真不再只确认 UI 风格，还会确认视觉参考、图标策略和是否需要品牌资产。
+- 品牌资产不是强制能力；用户不需要 logo / 形象 / 配图 / 图标策略时会明确跳过。
+- B 端增强 demo 走 Linear/Vercel 式现代 SaaS，使用克制 logo mark 和内联 SVG 线性图标。
+- C 端增强 demo 根据用户反馈覆盖为鲜生即时到家业务，借鉴美团买菜类产品的信息结构、商品流和购买路径，但使用原创品牌“巷鲜达”、原创蔬果配送形象、统一线性图标、远程商品配图和来源记录。
+
+### 测试方式
+- 使用 `04-hi-fi-test.md` 中的 B 端 / C 端两句提示词做人工验收。
+- 静态检查规则、demo 文件、内联脚本语法、远程图片来源记录和 `git diff --check`。
+
+### 测试结果
+- 关键词覆盖检查通过，确认协作门禁、视觉参考库、品牌资产、图标策略、禁用默认 emoji 和两句测试提示词均已写入。
+- HTML 结构检查通过，两个增强版 demo 均包含右侧说明文档、编号标注、标注显隐、双向 hover / focus 和交互钩子。
+- 两个增强版 demo 的内联脚本均通过 `node --check`。
+- 临时 HTTP 预览探针通过，两个增强版 demo 均返回 200，并包含右侧说明文档结构。
+- 新增增强版 demo 通过 emoji 检查，未使用 emoji 作为产品图标。
+- `git diff --check` 通过；仅有 Windows 行尾转换提示，无空白错误。
+
+### 追加调整
+- 用户指出 C 端社区交换 demo 排版混乱且品牌理念不应像标签一样堆在首页。
+- 已按用户确认覆盖当前 C 端品牌 demo 为鲜生即时到家高保真，不新增第三个 C 端 demo。
+- 新 demo 默认采用“定位 / 配送时效 + 搜索 + 优惠 + 分类横滑 + 商品流 + 悬浮购物车 + 底部导航”的购买路径。
+
+### 遇到的问题 / 瓶颈
+- Windows 环境下 `apply_patch` 删除旧 untracked HTML / prompt 文件失败；已改为新增增强版 demo，并用 PowerShell 覆盖测试提示词文件。
+
+### 暂未解决
+- 旧风格化 demo 仍保留为历史初始验证稿，增强版 demo 才是当前 Step 4 风格系统与品牌资产参考。
+
+### 下一步目标
+- 完成静态检查和用户验收后，再决定是否提交 / 推送。
+
+### Git 提交
+- 待用户确认后提交。
+
+## 2026-06-28 - Step 4 App High-Fidelity And Template Enhancement
+
+### 本次完成
+- 新增 `built-in-skills/app-hifi.md`，建立 App 视觉参考单、Mobbin / Page Flows 使用边界、iOS / Android 路由、移动排版契约和交付闸门。
+- 更新 `SKILL.md`、`hi-fi.md`、`visual-reference-library.md` 和 `frontend-quality.md`，将 iOS App 路由锁定为“Mobbin 公开样本 + Page Flows 任务流 + Apple HIG”，Android 保留 Material 3 路由。
+- 重做 `starter-components/hi-fi-mobile-shell.html`，形成原生 shell、发现流、详情页、底部 Sheet 和确认态组成的 iOS 模板套件。
+- 新增规范化 C 端 demo `examples/02-hi-fi-demo/c-side-ios-weekend-discovery.html`，产品为原创城市周末发现 App“周末里”。
+- C 端 demo 覆盖发现首页、活动详情和预约确认三屏路径，包含筛选、详情进入 / 返回、收藏、场次选择、确认反馈和标注双向高亮。
+- 旧 `c-side-branded-lifestyle-exchange.html` 已移除；Skill 和文档统一引用新文件名。
+- 更新 `04-hi-fi-test.md` 的 C 端提示词为 iOS 城市周末生活发现 App。
+
+### 当前效果
+- App 高保真不能只声明 Apple HIG 或 Material 3；必须先说明真实产品样本、任务流、借鉴点和明确不复制内容。
+- Mobbin / Page Flows 登录或付费内容不可访问时，允许使用公开样本与官方规范继续，但必须披露访问范围。
+- iOS 模板和 demo 使用独立的大标题、标题、正文、辅助信息、说明文字和 Tab 标签字号，不再用网页式全局 `14px` 处理移动端文字。
+- demo 使用系统字体、8pt 节奏、44px 触控区、safe area、两行说明限制和固定操作预留空间。
+- 标注默认隐藏，右侧文档可控制显隐；产品首屏不会被编号圆点破坏。
+
+### 测试结果
+- 规则覆盖检查通过：App 视觉参考单、Mobbin / Page Flows、Apple HIG / Material 3 路由、公开样本回退、反复制边界和移动排版门槛均已写入。
+- starter 与 demo 均包含 7 个编号标注、标注显隐、双向 hover / focus、发现页、详情页、Sheet 和成功态；内联脚本通过 `node --check`。
+- 系统 Chrome 桌面截图确认远程图片正常加载，App 和右侧文档无文字重叠或异常换行。
+- 精确浏览器复测通过：393×852、390×844、360×780 均无横向溢出，手机容器与视口尺寸一致。
+- 三屏交互复测通过：详情打开、Sheet 关闭、成功态和“周日 19:30”场次回写均正确。
+- `git diff --check` 通过；仅有 Windows 行尾转换提示。
+
+### 遇到的问题 / 瓶颈
+- Playwright CLI 无法直接启动用户目录 Chrome，返回 `spawn UNKNOWN`；改用系统 Chrome + Playwright Core CDP 完成同等精确视口和交互验收。
+
+### Git 提交
+- 待用户验收后提交。

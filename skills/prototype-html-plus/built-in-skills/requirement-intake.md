@@ -54,6 +54,7 @@ Must ask when any of these are missing or contradictory:
 - Scope: page, module, flow, or region to prototype.
 - Core modules or information blocks.
 - Key data, fields, states, or business boundary needed to make the prototype realistic.
+- For high-fidelity requests, whether logo, brand character, imagery, or icon strategy is needed. This is a light route question; if the user says no, skip brand assets.
 
 Do not ask more than 5 questions per round. Prioritize questions that determine scope, platform, output mode, core modules, and data/fields.
 
@@ -148,20 +149,29 @@ Use this structure by default. Keep it concise, but complete enough to guide the
 - 明确不做的反模式：
 - 状态：已确认 / 待确认 / Agent 假设
 
-## 14. 原型分步计划
+## 14. 高保真视觉与品牌资产需求
+- 是否需要 UI 风格确认：需要 / 不需要 / 待确认
+- 是否需要 logo：需要 / 不需要 / 待确认
+- 是否需要品牌形象 / 吉祥物：需要 / 不需要 / 待确认
+- 是否需要配图：网上素材 / image-2 生成 / 用户提供 / 不需要 / 待确认
+- 是否需要图标策略：需要 / 不需要 / 待确认
+- 禁用相似品牌 / IP：
+- 状态：已确认 / 待确认 / Agent 假设
+
+## 15. 原型分步计划
 - Step A 主路径初版：
 - Step B 扩展交互：
 - Step C 异常状态 / 空状态 / 加载状态：
 - Step D 视觉细化 / 高保真补充：
 - 当前建议先做：
 
-## 15. 分步执行协议
+## 16. 分步执行协议
 - 默认每次只执行：
 - 当前步骤完成后的验收方式：
 - 用户验收后如何调整计划：
 - 状态：已确认 / 待确认 / Agent 假设
 
-## 16. 需要用户确认的问题
+## 17. 需要用户确认的问题
 1.
 2.
 3.
@@ -196,6 +206,11 @@ Example:
 4. 有无参考截图、现有系统或风格要求？
    - A. 有，我会上传 / 描述
    - B. 没有，请帮我推荐
+
+5. 如果后续做高保真，是否需要 logo、品牌形象、配图或图标策略？
+   - A. 需要 logo / 品牌形象
+   - B. 只需要配图或图标策略
+   - C. 暂不需要，先做界面本身
 ```
 
 ## Help-Me-Recommend Behavior

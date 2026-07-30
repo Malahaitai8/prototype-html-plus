@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>B-Side Hi-Fi Demo - Operations Console</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --ink: #1f2329;
+      --muted: #667085;
+      --line: #d9dfe7;
+      --soft: #f8fafc;
+      --nav: #001529;
+      --primary: #1677ff;
+      --primary-soft: #e6f4ff;
+      --carbon-blue: #0f62fe;
+      --success: #198038;
+      --warning: #b26a00;
+      --danger: #da1e28;
+      --radius: 6px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--bg); font-size: 14px; line-height: 1.45; }
+    button, input, select { font: inherit; }
+    button { min-height: 32px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); color: var(--ink); cursor: pointer; padding: 6px 12px; }
+    button:hover, button.active { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+    button.primary { border-color: var(--primary); background: var(--primary); color: #fff; }
+    button.primary:hover { background: #0958d9; color: #fff; }
+    button.link { border: 0; background: transparent; color: var(--primary); padding: 0; min-height: 24px; }
+    button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .shell { min-height: 100vh; display: grid; grid-template-columns: minmax(920px, 1fr) 372px; }
+    .prototype { padding: 16px; overflow: auto; }
+    .doc-panel { position: sticky; top: 0; height: 100vh; overflow: auto; border-left: 1px solid var(--line); background: var(--panel); padding: 18px; }
+    .app { min-height: calc(100vh - 32px); display: grid; grid-template-columns: 210px minmax(0, 1fr); border: 1px solid var(--line); background: var(--panel); box-shadow: 0 10px 28px rgba(17, 24, 39, .08); }
+    .sidebar { background: var(--nav); color: rgba(255,255,255,.82); padding: 14px 10px; }
+    .brand { height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 10px; color: #fff; font-weight: 700; }
+    .brand-mark { width: 18px; height: 18px; border-radius: 4px; background: var(--primary); }
+    .nav-group { margin-top: 16px; }
+    .nav-label { padding: 0 10px 8px; font-size: 12px; color: rgba(255,255,255,.48); }
+    .nav-item { min-height: 36px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; border-radius: var(--radius); margin: 4px 0; }
+    .nav-item.active { background: var(--primary); color: #fff; }
+    .nav-count { font-size: 12px; color: rgba(255,255,255,.58); }
+    .workspace { min-width: 0; display: grid; grid-template-rows: auto 1fr; background: var(--bg); }
+    .topbar { min-height: 58px; border-bottom: 1px solid var(--line); background: var(--panel); display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 16px; }
+    .crumb { color: var(--muted); font-size: 12px; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { margin-top: 2px; font-size: 20px; letter-spacing: 0; }
+    h2 { font-size: 15px; letter-spacing: 0; }
+    h3 { font-size: 14px; }
+    p { color: var(--muted); }
+    .command-bar { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; align-items: center; }
+    .content { padding: 16px; display: grid; gap: 14px; align-content: start; }
+    .panel, .doc-item { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); }
+    .panel { padding: 14px; position: relative; }
+    .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .metric { min-height: 92px; border-left: 3px solid var(--carbon-blue); padding: 10px 10px 8px 12px; background: #fff; }
+    .metric small { color: var(--muted); }
+    .metric strong { display: block; margin-top: 8px; font-size: 24px; letter-spacing: 0; }
+    .metric span { display: inline-flex; margin-top: 6px; font-size: 12px; color: var(--success); }
+    .main-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 14px; align-items: start; }
+    .panel-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 12px; }
+    .filters { display: grid; grid-template-columns: minmax(180px, 1fr) 132px 132px auto; gap: 8px; margin-bottom: 12px; }
+    .field { min-height: 32px; border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 10px; background: #fff; color: var(--ink); }
+    .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+    .table { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: #fff; }
+    .row { display: grid; grid-template-columns: 1.2fr .8fr .8fr .8fr .75fr; gap: 10px; align-items: center; min-height: 44px; padding: 8px 12px; border-top: 1px solid var(--line); }
+    .row:first-child { min-height: 38px; border-top: 0; background: var(--soft); color: var(--muted); font-weight: 700; }
+    .row.selected { background: var(--primary-soft); }
+    .tag { display: inline-flex; align-items: center; min-height: 22px; border-radius: 999px; padding: 0 8px; border: 1px solid var(--line); background: #fff; color: var(--muted); font-size: 12px; }
+    .tag.success { color: var(--success); border-color: #b7ebc6; background: #f0fbf4; }
+    .tag.warning { color: var(--warning); border-color: #ffd591; background: #fff7e6; }
+    .tag.danger { color: var(--danger); border-color: #ffccc7; background: #fff1f0; }
+    .detail-stack { display: grid; gap: 10px; }
+    .detail-line { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+    .detail-line:last-child { border-bottom: 0; }
+    .timeline { display: grid; gap: 8px; }
+    .event { display: grid; grid-template-columns: 8px 1fr; gap: 8px; align-items: start; color: var(--muted); }
+    .dot { width: 8px; height: 8px; margin-top: 6px; border-radius: 999px; background: var(--carbon-blue); }
+    .drawer { position: fixed; top: 0; right: 372px; width: 380px; max-width: calc(100vw - 40px); height: 100vh; background: #fff; border-left: 1px solid var(--line); box-shadow: -16px 0 40px rgba(17,24,39,.14); transform: translateX(110%); transition: transform .18s ease; z-index: 20; display: grid; grid-template-rows: auto 1fr auto; }
+    .drawer.open { transform: translateX(0); }
+    .drawer-head, .drawer-foot { padding: 14px; border-bottom: 1px solid var(--line); }
+    .drawer-foot { border-bottom: 0; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 8px; }
+    .drawer-body { padding: 14px; overflow: auto; display: grid; gap: 12px; align-content: start; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,.32); display: none; place-items: center; z-index: 30; }
+    .modal-backdrop.open { display: grid; }
+    .modal { width: min(420px, calc(100vw - 32px)); background: #fff; border-radius: 8px; box-shadow: 0 20px 48px rgba(17,24,39,.22); padding: 18px; display: grid; gap: 12px; }
+    .target { position: relative; outline: 0 solid transparent; transition: background .16s ease, outline-color .16s ease; }
+    .target.is-active { outline: 2px solid var(--primary); background: var(--primary-soft); }
+    .pin { position: absolute; top: -10px; right: -10px; z-index: 2; width: 24px; height: 24px; border-radius: 999px; display: grid; place-items: center; background: #111827; color: #fff; border: 2px solid #fff; box-shadow: 0 0 0 1px #8b95a1; font-size: 12px; font-weight: 700; }
+    body.hide-pins .pin { display: none; }
+    .doc-panel h1 { font-size: 18px; }
+    .doc-panel h2 { margin: 18px 0 8px; font-size: 14px; }
+    .doc-panel p { margin-top: 4px; }
+    .doc-item { padding: 10px 10px 10px 42px; margin: 8px 0; position: relative; }
+    .doc-item::before { content: attr(data-pin); position: absolute; left: 10px; top: 10px; width: 22px; height: 22px; border-radius: 999px; display: grid; place-items: center; background: #111827; color: #fff; font-size: 12px; font-weight: 700; }
+    .doc-item.is-active { border-color: var(--primary); background: var(--primary-soft); }
+    .small { font-size: 12px; color: var(--muted); }
+    .hidden { display: none !important; }
+    @media (max-width: 1120px) {
+      .shell { display: block; }
+      .doc-panel { position: static; height: auto; border-left: 0; border-top: 1px solid var(--line); }
+      .drawer { right: 0; }
+    }
+    @media (max-width: 920px) {
+      .prototype { padding: 10px; }
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .metrics, .main-grid, .filters { grid-template-columns: 1fr; }
+      .row { grid-template-columns: 1fr 1fr; }
+      .topbar { align-items: flex-start; flex-direction: column; padding: 12px; }
+      .command-bar { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="prototype" aria-label="B-side high fidelity operations console">
+      <div class="app">
+        <nav class="sidebar" aria-label="主导航">
+          <div class="brand"><span class="brand-mark"></span><span>Ops Center</span></div>
+          <div class="nav-group">
+            <div class="nav-label">运营监控</div>
+            <div class="nav-item active"><span>数据同步</span><span class="nav-count">17</span></div>
+            <div class="nav-item"><span>设备心跳</span><span class="nav-count">42</span></div>
+            <div class="nav-item"><span>异常队列</span><span class="nav-count">8</span></div>
+          </div>
+          <div class="nav-group">
+            <div class="nav-label">管理</div>
+            <div class="nav-item"><span>权限审计</span></div>
+            <div class="nav-item"><span>规则配置</span></div>
+          </div>
+        </nav>
+
+        <section class="workspace">
+          <header class="topbar target" data-anno="1">
+            <span class="pin">1</span>
+            <div>
+              <div class="crumb">控制台 / 数据同步 / Step A</div>
+              <h1>全球摄像头数据同步监控</h1>
+              <p>基于 Ant Design 的后台操作结构，叠加 Carbon 式数据密度和监控层级。</p>
+            </div>
+            <div class="command-bar">
+              <button type="button" data-toggle-pins>隐藏标注</button>
+              <button type="button">导出明细</button>
+              <button type="button" class="primary" data-open-modal>发起批量同步</button>
+            </div>
+          </header>
+
+          <div class="content">
+            <section class="panel target" data-anno="2">
+              <span class="pin">2</span>
+              <div class="panel-head">
+                <div>
+                  <h2>同步健康度</h2>
+                  <p class="small">当前 Step A 只覆盖新增、更新、摄像头心跳和异常确认。</p>
+                </div>
+                <span class="tag success">最近刷新 09:42</span>
+              </div>
+              <div class="metrics">
+                <article class="metric"><small>今日新增数据源</small><strong>1,284</strong><span>+12.4%</span></article>
+                <article class="metric"><small>同步成功率</small><strong>96.8%</strong><span>高于阈值</span></article>
+                <article class="metric"><small>全球在线摄像头</small><strong>24,812</strong><span>心跳正常</span></article>
+                <article class="metric"><small>待处理异常</small><strong>17</strong><span style="color: var(--danger)">需确认</span></article>
+              </div>
+            </section>
+
+            <div class="main-grid">
+              <section class="panel target" data-anno="3">
+                <span class="pin">3</span>
+                <div class="panel-head">
+                  <h2>数据任务列表</h2>
+                  <span class="small">筛选、切换、选中行均会改变当前视图</span>
+                </div>
+                <div class="filters">
+                  <input class="field" aria-label="搜索数据源" placeholder="搜索数据源 / 摄像头编号">
+                  <select class="field" aria-label="区域筛选">
+                    <option>全部区域</option>
+                    <option>亚太</option>
+                    <option>欧洲</option>
+                    <option>北美</option>
+                  </select>
+                  <select class="field" aria-label="状态筛选" data-status-filter>
+                    <option value="all">全部状态</option>
+                    <option value="success">成功</option>
+                    <option value="warning">待确认</option>
+                    <option value="danger">异常</option>
+                  </select>
+                  <button type="button" data-filter>应用筛选</button>
+                </div>
+                <div class="tabs" role="tablist" aria-label="数据类型">
+                  <button type="button" class="active" data-tab="new" aria-pressed="true">新增数据</button>
+                  <button type="button" data-tab="update" aria-pressed="false">更新批次</button>
+                  <button type="button" data-tab="camera" aria-pressed="false">摄像头心跳</button>
+                </div>
+                <div class="table" data-panel="new">
+                  <div class="row"><span>数据源</span><span>区域</span><span>状态</span><span>更新时间</span><span>操作</span></div>
+                  <div class="row selected" data-row-status="success" data-detail="Camera-AP-1048 / 新增成功 / 亚太 / 09:42"><span>Camera-AP-1048</span><span>亚太</span><span><span class="tag success">成功</span></span><span>09:42</span><button type="button" class="link" data-open-drawer>详情</button></div>
+                  <div class="row" data-row-status="warning" data-detail="Camera-EU-2210 / 待确认 / 欧洲 / 09:36"><span>Camera-EU-2210</span><span>欧洲</span><span><span class="tag warning">待确认</span></span><span>09:36</span><button type="button" class="link" data-open-drawer>详情</button></div>
+                  <div class="row" data-row-status="danger" data-detail="Camera-NA-0933 / 同步异常 / 北美 / 09:30"><span>Camera-NA-0933</span><span>北美</span><span><span class="tag danger">异常</span></span><span>09:30</span><button type="button" class="link" data-open-drawer>详情</button></div>
+                </div>
+                <div class="table hidden" data-panel="update">
+                  <div class="row"><span>批次</span><span>类型</span><span>状态</span><span>负责人</span><span>操作</span></div>
+                  <div class="row" data-row-status="success" data-detail="Batch-7781 / 字段更新 / 成功 / 林青"><span>Batch-7781</span><span>字段更新</span><span><span class="tag success">成功</span></span><span>林青</span><button type="button" class="link" data-open-drawer>详情</button></div>
+                  <div class="row" data-row-status="warning" data-detail="Batch-7782 / 坐标校准 / 待确认 / 周南"><span>Batch-7782</span><span>坐标校准</span><span><span class="tag warning">待确认</span></span><span>周南</span><button type="button" class="link" data-open-drawer>详情</button></div>
+                </div>
+                <div class="table hidden" data-panel="camera">
+                  <div class="row"><span>摄像头</span><span>位置</span><span>状态</span><span>心跳</span><span>操作</span></div>
+                  <div class="row" data-row-status="success" data-detail="GL-02481 / 在线 / 新加坡 / 10 秒前"><span>GL-02481</span><span>新加坡</span><span><span class="tag success">在线</span></span><span>10 秒前</span><button type="button" class="link" data-open-drawer>详情</button></div>
+                  <div class="row" data-row-status="danger" data-detail="GL-02482 / 离线 / 柏林 / 8 分钟前"><span>GL-02482</span><span>柏林</span><span><span class="tag danger">离线</span></span><span>8 分钟前</span><button type="button" class="link" data-open-drawer>详情</button></div>
+                </div>
+              </section>
+
+              <aside class="panel target" data-anno="4">
+                <span class="pin">4</span>
+                <h2>当前明细</h2>
+                <div class="detail-stack">
+                  <div class="detail-line"><span>对象</span><strong data-detail-object>Camera-AP-1048</strong></div>
+                  <div class="detail-line"><span>状态</span><span data-detail-status>新增成功</span></div>
+                  <div class="detail-line"><span>区域</span><span data-detail-region>亚太</span></div>
+                  <div class="detail-line"><span>更新时间</span><span data-detail-time>09:42</span></div>
+                  <button type="button" class="primary" data-open-drawer>打开处理抽屉</button>
+                </div>
+              </aside>
+            </div>
+
+            <section class="panel target" data-anno="5">
+              <span class="pin">5</span>
+              <div class="panel-head">
+                <div>
+                  <h2>处理时间线</h2>
+                  <p class="small">Carbon 式紧凑事件流，用于解释批量任务的监控状态。</p>
+                </div>
+                <span class="tag warning" data-sync-state>等待人工确认</span>
+              </div>
+              <div class="timeline">
+                <div class="event"><span class="dot"></span><span>09:42 新增数据源完成入库，自动校验通过。</span></div>
+                <div class="event"><span class="dot"></span><span>09:37 发现 17 条异常，已进入人工确认队列。</span></div>
+                <div class="event"><span class="dot"></span><span>09:30 北美节点心跳超时，等待二次同步。</span></div>
+              </div>
+            </section>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <aside class="doc-panel" aria-label="高保真说明文档">
+      <h1>右侧说明文档</h1>
+      <p>本 demo 参考 Ant Design 的后台操作结构，并用 Carbon 的数据密度和监控层级增强复杂信息可读性。未引入任何外部组件库。</p>
+
+      <h2>原型说明</h2>
+      <p class="small">Step A 只验证全球摄像头数据同步的主路径：查看状态、筛选数据、切换数据类型、查看明细、发起批量同步。</p>
+
+      <h2>功能说明</h2>
+      <p class="small">运营人员可在同一工作台完成指标判断、列表筛选、详情处理和批量动作确认。</p>
+
+      <h2>字段说明</h2>
+      <p class="small">核心字段包括数据源、区域、状态、更新时间、批次、负责人、摄像头心跳、异常数量和处理建议。</p>
+
+      <h2>交互说明</h2>
+      <p class="small">支持标注显隐、Tab 切换、状态筛选、选中行更新明细、详情抽屉和批量同步确认弹窗。</p>
+
+      <h2>编号标注</h2>
+      <div class="doc-item" data-anno="1" data-pin="1"><strong>工作台头部</strong><br>体现 Ant Design 式面包屑、标题、说明和右侧命令区。</div>
+      <div class="doc-item" data-anno="2" data-pin="2"><strong>指标密度</strong><br>使用 Carbon 式紧凑指标，优先服务监控判断而不是装饰。</div>
+      <div class="doc-item" data-anno="3" data-pin="3"><strong>筛选与表格</strong><br>后台主操作区，承载筛选、Tab、表格、状态和行级动作。</div>
+      <div class="doc-item" data-anno="4" data-pin="4"><strong>当前明细</strong><br>让选中行在右侧形成稳定上下文，减少跳页。</div>
+      <div class="doc-item" data-anno="5" data-pin="5"><strong>处理时间线</strong><br>展示监控事件和人工确认状态，避免只有静态卡片。</div>
+
+      <h2>验收点</h2>
+      <p class="small">页面应体现数据密集后台，而不是泛泛卡片拼贴；用户应能完成筛选、查看详情和发起同步三个当前步骤动作。</p>
+    </aside>
+  </main>
+
+  <aside class="drawer" aria-label="处理抽屉" data-drawer>
+    <div class="drawer-head">
+      <h2>处理详情</h2>
+      <p class="small" data-drawer-title>Camera-AP-1048 / 新增成功 / 亚太 / 09:42</p>
+    </div>
+    <div class="drawer-body">
+      <div class="panel">
+        <h3>字段核对</h3>
+        <div class="detail-line"><span>来源可信度</span><strong>高</strong></div>
+        <div class="detail-line"><span>校验结果</span><span class="tag success">通过</span></div>
+        <div class="detail-line"><span>风险提示</span><span>仅影响当前同步批次</span></div>
+      </div>
+      <div class="panel">
+        <h3>处理建议</h3>
+        <p>确认入库后，系统将继续监控 10 分钟心跳；若状态转为异常，进入人工队列。</p>
+      </div>
+    </div>
+    <div class="drawer-foot">
+      <button type="button" data-close-drawer>关闭</button>
+      <button type="button" class="primary" data-confirm-drawer>确认处理</button>
+    </div>
+  </aside>
+
+  <div class="modal-backdrop" data-modal>
+    <div class="modal" role="dialog" aria-modal="true" aria-label="批量同步确认">
+      <h2>确认发起批量同步？</h2>
+      <p>本次将同步 3 个区域、48 个数据源和 12 条异常明细。请确认不会覆盖人工锁定记录。</p>
+      <div class="command-bar">
+        <button type="button" data-close-modal>取消</button>
+        <button type="button" class="primary" data-confirm-modal>确认同步</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const syncActive = (id, on) => {
+      document.querySelectorAll(`[data-anno="${id}"]`).forEach((node) => node.classList.toggle('is-active', on));
+    };
+
+    document.querySelectorAll('[data-anno]').forEach((node) => {
+      const id = node.getAttribute('data-anno');
+      node.addEventListener('mouseenter', () => syncActive(id, true));
+      node.addEventListener('mouseleave', () => syncActive(id, false));
+      node.addEventListener('focusin', () => syncActive(id, true));
+      node.addEventListener('focusout', () => syncActive(id, false));
+    });
+
+    document.querySelector('[data-toggle-pins]').addEventListener('click', (event) => {
+      document.body.classList.toggle('hide-pins');
+      event.currentTarget.textContent = document.body.classList.contains('hide-pins') ? '显示标注' : '隐藏标注';
+    });
+
+    document.querySelectorAll('[data-tab]').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('[data-tab]').forEach((item) => {
+          item.classList.toggle('active', item === tab);
+          item.setAttribute('aria-pressed', item === tab ? 'true' : 'false');
+        });
+        document.querySelectorAll('[data-panel]').forEach((panel) => panel.classList.toggle('hidden', panel.dataset.panel !== tab.dataset.tab));
+      });
+    });
+
+    document.querySelector('[data-filter]').addEventListener('click', () => {
+      const value = document.querySelector('[data-status-filter]').value;
+      document.querySelectorAll('[data-row-status]').forEach((row) => {
+        row.classList.toggle('hidden', value !== 'all' && row.dataset.rowStatus !== value);
+      });
+    });
+
+    const updateDetail = (detail) => {
+      const [object, status, region, time] = detail.split(' / ');
+      document.querySelector('[data-detail-object]').textContent = object;
+      document.querySelector('[data-detail-status]').textContent = status;
+      document.querySelector('[data-detail-region]').textContent = region;
+      document.querySelector('[data-detail-time]').textContent = time;
+      document.querySelector('[data-drawer-title]').textContent = detail;
+    };
+
+    document.querySelectorAll('[data-open-drawer]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const row = button.closest('.row');
+        if (row && row.dataset.detail) {
+          document.querySelectorAll('.row.selected').forEach((item) => item.classList.remove('selected'));
+          row.classList.add('selected');
+          updateDetail(row.dataset.detail);
+        }
+        document.querySelector('[data-drawer]').classList.add('open');
+      });
+    });
+
+    document.querySelector('[data-close-drawer]').addEventListener('click', () => {
+      document.querySelector('[data-drawer]').classList.remove('open');
+    });
+
+    document.querySelector('[data-confirm-drawer]').addEventListener('click', () => {
+      document.querySelector('[data-sync-state]').textContent = '已确认处理';
+      document.querySelector('[data-sync-state]').classList.remove('warning');
+      document.querySelector('[data-sync-state]').classList.add('success');
+      document.querySelector('[data-drawer]').classList.remove('open');
+    });
+
+    document.querySelector('[data-open-modal]').addEventListener('click', () => {
+      document.querySelector('[data-modal]').classList.add('open');
+    });
+
+    document.querySelector('[data-close-modal]').addEventListener('click', () => {
+      document.querySelector('[data-modal]').classList.remove('open');
+    });
+
+    document.querySelector('[data-confirm-modal]').addEventListener('click', () => {
+      document.querySelector('[data-sync-state]').textContent = '批量同步进行中';
+      document.querySelector('[data-sync-state]').classList.remove('warning', 'success');
+      document.querySelector('[data-modal]').classList.remove('open');
+    });
+  </script>
+</body>
+</html>

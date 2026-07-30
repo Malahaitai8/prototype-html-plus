@@ -90,19 +90,28 @@ Acceptance:
 - The demo creates a previewable low-fidelity HTML prototype with a side documentation panel.
 - Structure, interaction path, and page relationships are clearer than visual decoration.
 
-### Step 4 - Basic High-Fidelity Mode
+### Step 4 - High-Fidelity Mode
 
 Outputs:
 
 - `skills/prototype-html-plus/built-in-skills/hi-fi.md`.
-- Starter components for admin layout, table page, and modal.
-- `skills/prototype-html-plus/examples/02-hi-fi-admin-demo/`.
+- `skills/prototype-html-plus/built-in-skills/frontend-quality.md`.
+- `skills/prototype-html-plus/built-in-skills/visual-reference-library.md`.
+- Starter components for B-side admin layout and C-side mobile shell.
+- `skills/prototype-html-plus/examples/02-hi-fi-demo/`.
 - Test prompt: `skills/prototype-html-plus/test-prompts/04-hi-fi-test.md`.
 
 Acceptance:
 
-- The demo creates a previewable admin-style HTML page with realistic B-side density and controls.
-- The page includes side documentation and common interaction states.
+- High-fidelity generation declares selected internal and official references before producing HTML.
+- High-fidelity generation confirms UI style before producing HTML.
+- High-fidelity generation asks whether logo, brand character, imagery, or icon strategy is needed; if not needed, it skips the brand-asset route.
+- The style system route covers UI style, layout, typography, color, component density, state expression, and motion rhythm.
+- The brand asset route covers logo, brand character / mascot, imagery, pictograms, and icon strategy.
+- The B-side demo creates a previewable Ant Design + Carbon-like admin page with realistic density and controls.
+- The C-side demo creates a previewable WeUI-like mobile mini-program page instead of a shrunken admin page.
+- Styled demos show that a confirmed Linear/Vercel-like SaaS style and a confirmed branded warm lifestyle style change layout, rhythm, material, color, icon strategy, and brand expression.
+- The pages include side documentation, numbered annotations, common interaction states, no component-library dependencies, and remote image source records when remote imagery is confirmed.
 
 ### Step 5 - Side Documentation and Pin Annotations
 
@@ -168,6 +177,7 @@ Acceptance:
 ## Collaboration Rules
 
 - Before starting each functional step, confirm the step's concrete requirements with the user.
+- Before every new functional step, new sub-capability, or scope redefinition, ask at least two rounds of questions, with at least two meaningful questions per round.
 - Do not decide key product rules without confirmation.
 - Do not implement multiple V1 steps in one pass unless explicitly asked.
 - Update `PROGRESS.md` before every commit and push.

@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>C-Side Hi-Fi Demo - Community Exchange WeChat Mini Program</title>
+  <style>
+    :root {
+      --bg: #f5f6f7;
+      --panel: #ffffff;
+      --ink: #1f2329;
+      --muted: #72777f;
+      --line: #e5e6eb;
+      --soft: #f7f8fa;
+      --primary: #07c160;
+      --primary-soft: #e8f8ef;
+      --warning: #faad14;
+      --danger: #e64340;
+      --radius: 8px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--bg); font-size: 14px; line-height: 1.45; }
+    button, input, textarea { font: inherit; }
+    button { min-height: 36px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); color: var(--ink); cursor: pointer; padding: 7px 12px; }
+    button.primary { border-color: var(--primary); background: var(--primary); color: #fff; }
+    button.warn { border-color: #ffd591; background: #fff7e6; color: #ad6800; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .shell { min-height: 100vh; display: grid; grid-template-columns: minmax(440px, 1fr) 372px; }
+    .prototype { padding: 18px; display: grid; place-items: start center; overflow: auto; }
+    .doc-panel { position: sticky; top: 0; height: 100vh; overflow: auto; border-left: 1px solid var(--line); background: var(--panel); padding: 18px; }
+    .phone { width: min(390px, 100%); min-height: 780px; border: 1px solid #d0d5dd; border-radius: 28px; background: #f7f8fa; overflow: hidden; box-shadow: 0 14px 34px rgba(17,24,39,.16); display: grid; grid-template-rows: auto auto 1fr auto; }
+    .status { height: 28px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; font-size: 12px; background: #fff; }
+    .nav { height: 48px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--line); background: #fff; font-weight: 700; position: relative; }
+    .nav button { position: absolute; left: 10px; min-height: 30px; padding: 4px 8px; border: 0; color: var(--primary); background: transparent; }
+    .screen { min-height: 0; overflow: auto; padding: 12px; display: grid; gap: 10px; align-content: start; }
+    .trust { border: 1px solid #b7ebc6; background: var(--primary-soft); color: #116329; border-radius: var(--radius); padding: 10px 12px; position: relative; }
+    .search { min-height: 36px; border-radius: 8px; border: 1px solid var(--line); background: #fff; padding: 0 12px; color: var(--muted); display: flex; align-items: center; }
+    .segmented { display: grid; grid-template-columns: repeat(3, 1fr); background: #fff; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    .segmented button { border: 0; border-radius: 0; color: var(--muted); }
+    .segmented button.active { color: var(--primary); background: var(--primary-soft); font-weight: 700; }
+    .cell, .doc-item { border: 1px solid var(--line); background: var(--panel); border-radius: var(--radius); }
+    .cell { padding: 12px; position: relative; }
+    .item-head { display: grid; grid-template-columns: 64px 1fr; gap: 10px; }
+    .thumb { width: 64px; height: 64px; border-radius: 8px; background: linear-gradient(135deg, #e5e7eb, #cbd5e1); display: grid; place-items: center; color: #475569; font-weight: 700; }
+    .item-title { display: flex; justify-content: space-between; gap: 8px; font-weight: 700; }
+    .cell p { margin: 6px 0 0; color: var(--muted); }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .tag { display: inline-flex; align-items: center; min-height: 22px; border-radius: 999px; padding: 0 8px; border: 1px solid var(--line); background: var(--soft); color: var(--muted); font-size: 12px; }
+    .tag.green { color: #116329; border-color: #b7ebc6; background: var(--primary-soft); }
+    .tag.warn { color: #ad6800; border-color: #ffd591; background: #fff7e6; }
+    .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .publish { position: sticky; bottom: 0; padding: 10px 12px; background: rgba(247,248,250,.94); backdrop-filter: blur(8px); border-top: 1px solid var(--line); }
+    .tabbar { height: 58px; border-top: 1px solid var(--line); background: #fff; display: grid; grid-template-columns: repeat(3, 1fr); }
+    .tabbar button { border: 0; border-radius: 0; color: var(--muted); background: #fff; display: grid; place-items: center; }
+    .tabbar button.active { color: var(--primary); font-weight: 700; }
+    .sheet-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,.32); display: none; align-items: end; justify-content: center; z-index: 30; }
+    .sheet-backdrop.open { display: flex; }
+    .sheet { width: min(390px, calc(100vw - 24px)); background: #fff; border-radius: 16px 16px 0 0; padding: 16px; display: grid; gap: 12px; }
+    .sheet h2 { margin: 0; font-size: 18px; }
+    .form-row { display: grid; gap: 6px; }
+    .form-row label { font-weight: 700; }
+    .field { min-height: 38px; border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; background: #fff; }
+    .toast { position: fixed; left: 50%; bottom: 88px; transform: translateX(-50%); background: rgba(0,0,0,.76); color: #fff; border-radius: 999px; padding: 8px 14px; display: none; z-index: 40; }
+    .toast.show { display: block; }
+    .target { position: relative; outline: 0 solid transparent; transition: background .16s ease, outline-color .16s ease; }
+    .target.is-active { outline: 2px solid var(--primary); background: var(--primary-soft); }
+    .pin { position: absolute; top: -10px; right: -10px; z-index: 2; width: 24px; height: 24px; border-radius: 999px; display: grid; place-items: center; background: #111827; color: #fff; border: 2px solid #fff; box-shadow: 0 0 0 1px #8b95a1; font-size: 12px; font-weight: 700; }
+    body.hide-pins .pin { display: none; }
+    .doc-panel h1 { margin: 0; font-size: 18px; }
+    .doc-panel h2 { margin: 18px 0 8px; font-size: 14px; }
+    .doc-panel p { color: var(--muted); margin: 4px 0 0; }
+    .doc-item { padding: 10px 10px 10px 42px; margin: 8px 0; position: relative; }
+    .doc-item::before { content: attr(data-pin); position: absolute; left: 10px; top: 10px; width: 22px; height: 22px; border-radius: 999px; display: grid; place-items: center; background: #111827; color: #fff; font-size: 12px; font-weight: 700; }
+    .doc-item.is-active { border-color: var(--primary); background: var(--primary-soft); }
+    .small { font-size: 12px; color: var(--muted); }
+    .hidden { display: none !important; }
+    @media (max-width: 860px) {
+      .shell { display: block; }
+      .prototype { padding: 12px; }
+      .doc-panel { position: static; height: auto; border-left: 0; border-top: 1px solid var(--line); }
+      .phone { min-height: 720px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="prototype" aria-label="C-side WeChat mini program high fidelity prototype">
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G 100%</span></div>
+        <header class="nav target" data-anno="1">
+          <span class="pin">1</span>
+          <button type="button" data-toggle-pins>隐藏</button>
+          <span>邻里闲置交换</span>
+        </header>
+        <section class="screen">
+          <div class="trust target" data-anno="2">
+            <span class="pin">2</span>
+            已认证：星河湾 3 期住户。平台仅提供记录与引导，不做担保。
+          </div>
+          <div class="search">搜索书籍、儿童用品、家电小件</div>
+          <div class="segmented" role="tablist" aria-label="分类筛选">
+            <button type="button" class="active" data-category="all" aria-pressed="true">全部</button>
+            <button type="button" data-category="swap" aria-pressed="false">交换</button>
+            <button type="button" data-category="low" aria-pressed="false">低价</button>
+          </div>
+
+          <article class="cell target" data-anno="3" data-item data-type="swap" data-title="儿童平衡车" data-status="可预约自提">
+            <span class="pin">3</span>
+            <div class="item-head">
+              <div class="thumb">车</div>
+              <div>
+                <div class="item-title"><span>儿童平衡车</span><span>交换</span></div>
+                <p>适合 3-5 岁，轻微使用痕迹，优先换绘本或积木。</p>
+                <div class="tag-row">
+                  <span class="tag green">同小区认证</span>
+                  <span class="tag">楼下自提</span>
+                  <span class="tag warn">不支持快递</span>
+                </div>
+              </div>
+            </div>
+            <div class="action-row">
+              <button type="button" data-open-detail>查看详情</button>
+              <button type="button" class="primary" data-reserve>预约交换</button>
+            </div>
+          </article>
+
+          <article class="cell" data-item data-type="low" data-title="小米电煮锅" data-status="低价转让">
+            <div class="item-head">
+              <div class="thumb">锅</div>
+              <div>
+                <div class="item-title"><span>小米电煮锅</span><span>￥39</span></div>
+                <p>宿舍小锅，功能正常，建议当面验货后自提。</p>
+                <div class="tag-row">
+                  <span class="tag green">住户已认证</span>
+                  <span class="tag">今晚可取</span>
+                </div>
+              </div>
+            </div>
+            <div class="action-row">
+              <button type="button" data-open-detail>查看详情</button>
+              <button type="button" class="primary" data-reserve>预约自提</button>
+            </div>
+          </article>
+
+          <article class="cell target" data-anno="4">
+            <span class="pin">4</span>
+            <div class="item-title"><span>纠纷记录入口</span><span class="tag warn">引导</span></div>
+            <p>仅记录沟通、取货时间和物品状态，不承诺平台担保或赔付。</p>
+            <button type="button" class="warn" data-show-toast>查看处理说明</button>
+          </article>
+        </section>
+
+        <div class="publish target" data-anno="5">
+          <span class="pin">5</span>
+          <button type="button" class="primary" style="width: 100%;" data-open-sheet>发布闲置</button>
+        </div>
+        <nav class="tabbar" aria-label="底部导航">
+          <button type="button" class="active">闲置</button>
+          <button type="button">预约</button>
+          <button type="button">我的</button>
+        </nav>
+      </div>
+    </section>
+
+    <aside class="doc-panel" aria-label="高保真说明文档">
+      <h1>右侧说明文档</h1>
+      <p>本 demo 主参考 WeUI：微信生态、单元格列表、底部主操作、轻弹层反馈和熟悉的小程序节奏。未混用 Ant Design Mobile 或 TDesign。</p>
+
+      <h2>原型说明</h2>
+      <p class="small">Step A 只覆盖发布闲置、浏览列表、发起交换预约和查看纠纷说明，不做支付、快递或平台担保。</p>
+
+      <h2>功能说明</h2>
+      <p class="small">同小区住户可浏览物品、筛选交换/低价、查看详情、预约自提，并通过发布入口提交闲置。</p>
+
+      <h2>字段说明</h2>
+      <p class="small">核心字段包括物品名称、交换/低价类型、认证状态、自提方式、风险提示、预约状态和纠纷记录入口。</p>
+
+      <h2>交互说明</h2>
+      <p class="small">支持标注显隐、分类筛选、详情/预约 toast、发布底部弹层、提交后状态反馈。</p>
+
+      <h2>编号标注</h2>
+      <div class="doc-item" data-anno="1" data-pin="1"><strong>微信小程序头部</strong><br>使用简洁导航和隐藏标注入口，符合轻量操作节奏。</div>
+      <div class="doc-item" data-anno="2" data-pin="2"><strong>可信身份提示</strong><br>突出同小区认证，同时明确平台不做担保。</div>
+      <div class="doc-item" data-anno="3" data-pin="3"><strong>物品列表单元</strong><br>用 WeUI-like cell 承载物品、标签、动作和预约入口。</div>
+      <div class="doc-item" data-anno="4" data-pin="4"><strong>纠纷边界</strong><br>把风险边界放进当前步骤，避免误导用户。</div>
+      <div class="doc-item" data-anno="5" data-pin="5"><strong>发布主操作</strong><br>底部主按钮打开发布弹层，避免把移动端做成后台表单。</div>
+
+      <h2>验收点</h2>
+      <p class="small">用户应能完成浏览、筛选、预约和发布入口；页面应像微信小程序，而不是后台控制台缩小版。</p>
+    </aside>
+  </main>
+
+  <div class="sheet-backdrop" data-sheet>
+    <section class="sheet" aria-label="发布闲置弹层">
+      <h2>发布闲置</h2>
+      <div class="form-row">
+        <label for="item-name">物品名称</label>
+        <input id="item-name" class="field" value="儿童绘本一套">
+      </div>
+      <div class="form-row">
+        <label for="item-note">交换说明</label>
+        <textarea id="item-note" class="field" rows="3">希望交换积木或儿童餐具，仅限小区门口自提。</textarea>
+      </div>
+      <div class="action-row">
+        <button type="button" data-close-sheet>取消</button>
+        <button type="button" class="primary" data-submit-sheet>提交发布</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" data-toast>已更新</div>
+
+  <script>
+    const syncActive = (id, on) => {
+      document.querySelectorAll(`[data-anno="${id}"]`).forEach((node) => node.classList.toggle('is-active', on));
+    };
+
+    document.querySelectorAll('[data-anno]').forEach((node) => {
+      const id = node.getAttribute('data-anno');
+      node.addEventListener('mouseenter', () => syncActive(id, true));
+      node.addEventListener('mouseleave', () => syncActive(id, false));
+      node.addEventListener('focusin', () => syncActive(id, true));
+      node.addEventListener('focusout', () => syncActive(id, false));
+    });
+
+    const showToast = (message) => {
+      const toast = document.querySelector('[data-toast]');
+      toast.textContent = message;
+      toast.classList.add('show');
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove('show'), 1800);
+    };
+
+    document.querySelector('[data-toggle-pins]').addEventListener('click', (event) => {
+      document.body.classList.toggle('hide-pins');
+      event.currentTarget.textContent = document.body.classList.contains('hide-pins') ? '显示' : '隐藏';
+    });
+
+    document.querySelectorAll('[data-category]').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('[data-category]').forEach((item) => {
+          item.classList.toggle('active', item === tab);
+          item.setAttribute('aria-pressed', item === tab ? 'true' : 'false');
+        });
+        const category = tab.dataset.category;
+        document.querySelectorAll('[data-item]').forEach((item) => {
+          item.classList.toggle('hidden', category !== 'all' && item.dataset.type !== category);
+        });
+      });
+    });
+
+    document.querySelectorAll('[data-open-detail]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const item = button.closest('[data-item]');
+        showToast(`${item.dataset.title}：${item.dataset.status}`);
+      });
+    });
+
+    document.querySelectorAll('[data-reserve]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const item = button.closest('[data-item]');
+        showToast(`已发起${item.dataset.title}预约`);
+      });
+    });
+
+    document.querySelector('[data-show-toast]').addEventListener('click', () => {
+      showToast('已打开纠纷处理说明');
+    });
+
+    document.querySelector('[data-open-sheet]').addEventListener('click', () => {
+      document.querySelector('[data-sheet]').classList.add('open');
+    });
+
+    document.querySelector('[data-close-sheet]').addEventListener('click', () => {
+      document.querySelector('[data-sheet]').classList.remove('open');
+    });
+
+    document.querySelector('[data-submit-sheet]').addEventListener('click', () => {
+      document.querySelector('[data-sheet]').classList.remove('open');
+      showToast('闲置已提交，等待邻里浏览');
+    });
+  </script>
+</body>
+</html>

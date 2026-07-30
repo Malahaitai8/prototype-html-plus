@@ -73,3 +73,43 @@
 - Long prototype refinement needs an iteration guard: the Agent should periodically restate current PRD step/presentation mode/acceptance target, read current files when context is noisy, and re-check Skill baselines before delivery.
 - B-side wireframes should usually favor desktop operational structure, density, filters, tables/lists, and detail panels when the PRD calls for them.
 - C-side wireframes should usually favor mobile flow structure, primary actions, state feedback, and step cues when the PRD calls for them.
+
+## 2026-06-26 - Step 4 High-Fidelity Decisions
+
+- Step 4 implements Basic High-Fidelity Mode, not screenshot rebuild. Region screenshot rebuild and full screenshot reproduction remain Step 6 scope.
+- High-fidelity generation supports two input paths: confirmed PRD directly to high-fidelity, and confirmed wireframe upgraded to high-fidelity.
+- Before generating high-fidelity output, the Skill must declare product type, platform, current PRD step, selected official reference, why it applies, and which references are intentionally not used.
+- High-fidelity mode uses `frontend-skill` for visual hierarchy, product-surface restraint, information density, realistic copy, and state completeness.
+- `design-system-reference.md` remains the routing table for official references; `frontend-quality.md` is the delivery quality gate.
+- Official high-fidelity references are Ant Design, Carbon Design System, Fluent 2, Apple Human Interface Guidelines, Material Design 3 / Material Web, Ant Design Mobile, WeUI, and TDesign Mobile Vue.
+- Step 4 B-side demo uses Ant Design as the primary reference for admin layout, navigation, filters, tables, forms, drawers, modals, and feedback; Carbon is the secondary reference for metric density, operational hierarchy, monitoring status, and complex data readability.
+- Step 4 C-side demo uses WeUI as the primary reference for WeChat mini-program rhythm, cell lists, bottom primary actions, lightweight trust prompts, sheets, and toast feedback.
+- Step 4 demos must not import official UI libraries, copy their source code, or blend multiple official systems for decorative effect.
+- Both high-fidelity demos must be single-file HTML with no CDN or remote resources, right-side documentation, numbered circular pins, annotation visibility toggle, two-way hover/focus highlighting, and at least two meaningful interactions.
+- After user feedback, high-fidelity mode now always requires UI style confirmation before HTML generation. The basic demos remain selectable "简约基础款 / 规范交付版" references instead of a direct-generation shortcut.
+- Step 4 adds two styled demo directions first: a B-side dark command center and a C-side warm lifestyle exchange. They prove that selected UI style must change layout, spacing, material, color, rhythm, and state expression, not only the primary color.
+
+## 2026-06-26 - Step 4 Style System And Brand Asset Decisions
+
+- Collaboration rule is now explicit: before every new functional step, new sub-capability, or scope redefinition, ask at least two rounds of questions, with at least two meaningful questions per round.
+- Step 4 high-fidelity is split into two sub-capabilities that merge at generation time: style system and brand assets.
+- Style system covers UI style, layout, typography, color, component density, state expression, and motion rhythm.
+- Brand assets cover logo, brand character / mascot, imagery, pictograms, and icon strategy.
+- Brand assets are optional. Requirement intake and UI style confirmation ask whether they are needed; if the user says no, the Skill skips that route.
+- `visual-reference-library.md` records official design systems, high-adoption modern UI references, icon references, and brand asset rules.
+- High-fidelity output should not use emoji as product icons by default. Use a confirmed icon strategy, usually inline SVG/CSS icons for single-file demos.
+- Brand assets must be original or user-provided. Do not copy existing brand IP such as famous mascots, logos, or campaign characters.
+- Network imagery is allowed when the user confirms it, but source URLs must be recorded.
+- The enhanced B-side styled demo is `b-side-modern-saas-ops.html`: Linear/Vercel-like SaaS surface, restrained logo mark, and consistent line icons.
+- The canonical enhanced C-side styled demo is now `c-side-ios-weekend-discovery.html`: an original iOS city-weekend discovery App with editorial imagery and a three-screen discovery, detail, and reservation path. The former fresh-grocery file was removed to avoid retaining a stale reference.
+
+## 2026-06-28 - Step 4 App High-Fidelity Decisions
+
+- Generic C-side mobile output must confirm iOS, Android, H5, or mini program before choosing a reference route; mini-program patterns are not the default for Apps.
+- iOS high-fidelity uses Mobbin public samples for real-product visual calibration, Page Flows for task-path validation, and Apple HIG as the final platform authority.
+- Android keeps the equivalent Mobbin + Page Flows + Material 3 route, but this iteration does not add an Android demo.
+- Mobbin and Page Flows are research sources, not code or asset libraries. The Skill extracts layout and flow rules and must not copy brands, screenshots, copywriting, photography, illustrations, or distinctive trade dress.
+- App generation requires a confirmed App Visual Reference Sheet after UI style confirmation. Public-source fallback is allowed when paid content is inaccessible and must be disclosed.
+- `hi-fi-mobile-shell.html` is now a composable iOS template kit covering a native shell, discovery feed, detail page, bottom sheet, and confirmation state.
+- App typography uses explicit mobile text roles, an 8-point spacing rhythm, safe areas, 44px touch targets, line clamping, and reserved space for fixed actions.
+- Styled App demos hide annotation pins by default so documentation does not degrade the product's first visual impression.
